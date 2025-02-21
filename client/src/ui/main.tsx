@@ -3,7 +3,7 @@ import "./index.css";
 import App from "./App.tsx";
 
 createRoot(document.getElementById("root")!).render(
-  <div className="">
+  <div className="px-8 py-4 h-svh w-full">
     <App />
   </div>
 );
