@@ -1,8 +1,8 @@
 import { Bot, Power } from "lucide-react";
-import React, { useState } from "react";
+import { useState } from "react";
 import { motion } from "framer-motion";
 
-function BotStatus() {
+function BotStatus({ jobsCount }: { jobsCount: number | null }) {
   const [botStatus, setBotStatus] = useState<"IDLE" | "BUSY">("IDLE");
 
   const toggleStatus = () => {
@@ -29,7 +29,7 @@ function BotStatus() {
             <div className="text-xs text-zinc-400">Status: {botStatus}</div>
           </div>
           <div className="flex flex-col text-xs text-zinc-400 border-l border-zinc-700 pl-4">
-            <span>Jobs applied: 125</span>
+            {jobsCount !== null && <span>Jobs applied: {jobsCount}</span>}
           </div>
         </div>
       </div>

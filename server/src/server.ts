@@ -2,7 +2,7 @@ import express from "express";
 import cookieParser from "cookie-parser"
 import cors from "cors"
 import linkedInRouter from "./router/linkedin.router.js"
-import userProfileRouter from "./router/userProfile.router.js"
+import linkedInJobsRouter from "./router/linkedInJobs.router.js"
 import { config } from "dotenv"
 import connectDb from "./db.js";
 
@@ -31,7 +31,7 @@ app.use(express.json());
 
 
 app.use("/linkedin", linkedInRouter)
-app.use("/user", userProfileRouter)
+app.use("/linkedin-jobs", linkedInJobsRouter)
 
 
 const PORT = process.env.PORT || 5500
