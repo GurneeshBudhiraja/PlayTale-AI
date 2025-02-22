@@ -31,7 +31,7 @@ app.use(express.json());
 
 
 app.use("/linkedin", linkedInRouter)
-app.use("/linkedin-jobs", linkedInJobsRouter)
+app.use("/linkedin-job", linkedInJobsRouter)
 
 
 const PORT = process.env.PORT || 5500

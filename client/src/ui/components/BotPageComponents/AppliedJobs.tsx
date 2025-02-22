@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Briefcase, ExternalLink, ChevronDown, Loader2 } from "lucide-react";
 import axios from "axios";
 import { useUserInfoContext } from "../../context/UserInfoContext";
-import { BACKEND_URL } from "../../../env";
+import { GET_ALL_JOBS } from "../../constants/backendRoute.constants";
 
 export interface Job {
   id: string;
@@ -26,7 +26,7 @@ function AppliedJobs({
 
   const getAllAppliedJobs = useCallback(async () => {
     try {
-      const { data } = await axios.get(`${BACKEND_URL}/linkedin-jobs`, {
+      const { data } = await axios.get(GET_ALL_JOBS, {
         params: {
           email: userInfo.email || "",
         },
