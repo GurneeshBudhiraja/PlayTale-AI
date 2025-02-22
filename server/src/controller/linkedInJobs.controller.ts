@@ -68,6 +68,8 @@ export async function saveAppliedJob(req: Request, res: Response) {
       }
     })
     const { email, ...jobInfo } = body
+
+    // Upserts the applied jobs by the user
     await JobsApplied.findOneAndUpdate({ email }, {
       $push: {
         totalJobs: {
@@ -78,7 +80,9 @@ export async function saveAppliedJob(req: Request, res: Response) {
     }, {
       new: true,
       upsert: true,
+      session
     })
+
     session.commitTransaction()
     session.endSession()
     res.status(200).json({
