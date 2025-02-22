@@ -6,7 +6,6 @@ import mongoose from "mongoose";
 export async function getAppliedJobs(req: Request, res: Response) {
   try {
     const email = (req.query.email as string).trim()
-    console.log(email)
     if (!email) {
       res.status(400).json({
         success: false,
@@ -17,6 +16,13 @@ export async function getAppliedJobs(req: Request, res: Response) {
     const appliedJobsDbResponse = await JobsApplied.find({
       email
     })
+    if (!appliedJobsDbResponse.length) {
+      res.status(200).json({
+        success: true,
+        appliedJobs: null,
+      })
+      return;
+    }
     const appliedJobs = appliedJobsDbResponse[0].totalJobs
     res.status(200).json({
       success: true,
@@ -24,7 +30,6 @@ export async function getAppliedJobs(req: Request, res: Response) {
     })
     return;
   } catch (error) {
-    console.log("Error getting all the applied jobs.")
     res.status(500).json({
       success: false,
       message: "Failed to get applied jobs",
@@ -65,7 +70,10 @@ export async function saveAppliedJob(req: Request, res: Response) {
     const { email, ...jobInfo } = body
     await JobsApplied.findOneAndUpdate({ email }, {
       $push: {
-        totalJobs: jobInfo
+        totalJobs: {
+          $each: [jobInfo],
+          $position: 0
+        }
       }
     }, {
       new: true,
