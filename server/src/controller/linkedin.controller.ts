@@ -24,8 +24,13 @@ export async function getLinkedInAccessToken(req: Request, res: Response) {
       token_type: string;
       id_token: string;
     }
-    console.log("access_token is:", access_token)
-    res.cookie("access-token", access_token)
+    res.cookie("access-token", access_token, {
+      httpOnly: true,
+      sameSite: true,
+      maxAge: expires_in,
+      secure: true,
+      path: "/"
+    })
     res.json({
       success: true,
       message: "LinkedIn access token has been generated successfully",
@@ -44,7 +49,6 @@ export async function getLinkedInAccessToken(req: Request, res: Response) {
 export async function getLinkedInUserInfo(req: Request, res: Response) {
   try {
     const accessToken = req.cookies["access-token"];
-    console.log(accessToken)
     if (!accessToken) {
       res.status(401).json({
         success: false,

@@ -3,6 +3,7 @@ import { Loader2 } from "lucide-react";
 import axios from "axios";
 import { BACKEND_URL } from "../../env";
 import { useNavigate } from "react-router";
+import { useUserInfoContext } from "../context/UserInfoContext";
 
 function LinkedInLogin({
   setIsLogging,
@@ -10,6 +11,7 @@ function LinkedInLogin({
   setIsLogging: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   const navigate = useNavigate();
+  const { setUserInfo } = useUserInfoContext();
   async function getAccessToken() {
     const code = window?.location?.href?.split("?")[1]?.split("code=")[1];
     console.log(code);
@@ -34,17 +36,28 @@ function LinkedInLogin({
         const { data } = await axios.get(`${BACKEND_URL}/linkedin/me`, {
           withCredentials: true,
         });
-        const { success, ...userInfo } = data as LinkedMeRouteType;
+        const { success, ...userInfo } = data as Omit<
+          LinkedMeRouteType,
+          "loggedIn"
+        >;
         if (success) {
-          console.log(userInfo);
+          setUserInfo({
+            ...userInfo,
+            loggedIn: true,
+          });
         }
       }
     } catch (error) {
       console.log("Error getting the access token:", error);
-      navigate("/");
-      return;
+      setUserInfo({
+        loggedIn: false,
+        email: "",
+        name: "",
+        picture: "",
+      });
     } finally {
       setIsLogging(false);
+      navigate("/");
     }
   }
 

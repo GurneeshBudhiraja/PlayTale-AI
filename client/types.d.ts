@@ -11,7 +11,24 @@ interface UserInfoContextType {
 }
 
 
-interface LinkedMeRouteType {
+interface LinkedMeRouteType extends UserInfoType {
   success: boolean;
-  info: Omit<UserInfoType, "loggedIn">;
+}
+
+
+
+interface JobProfileType {
+  resumeLink: string;
+  coverLetterLink: string;
+  botAssignedFolder: string;
+  userLinkedinProfileInfo: string;
+  personalWebsiteLink: string;
+  jobLocationCountry: string;
+  jobLocationCity?: string;
+  completed: boolean
+}
+
+interface JobProfileContextType {
+  jobProfile: JobProfileType,
+  setJobProfile: React.Dispatch<React.SetStateAction<JobProfileType>>
 }

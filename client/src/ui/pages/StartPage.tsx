@@ -2,17 +2,22 @@ import { linkedInLogin } from "../../utils";
 import Button from "../components/Button";
 import Text from "../components/Text";
 import { motion } from "framer-motion";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import LinkedInLogin from "../components/LinkedInLogin";
 import { useUserInfoContext } from "../context/UserInfoContext";
 import axios from "axios";
 import { BACKEND_URL } from "../../env";
+import { ArrowUpRightIcon } from "lucide-react";
+import { useNavigate } from "react-router";
 
 function StartPage() {
   const { setUserInfo, userInfo } = useUserInfoContext();
   const numberOfShapes = 25;
   const [isLogging, setIsLogging] = useState<boolean>(false);
-  async function getCurrentUser() {
+  const [isMounted, setIsMounted] = useState<boolean>(false);
+  const navigate = useNavigate();
+
+  const getCurrentUser = useCallback(async () => {
     try {
       const { data } = await axios.get(`${BACKEND_URL}/linkedin/me`, {
         withCredentials: true,
@@ -42,29 +47,32 @@ function StartPage() {
         loggedIn: false,
         picture: "",
       });
+    } finally {
+      setIsMounted(true);
     }
-  }
+  }, [setUserInfo]);
+
   useEffect(() => {
     if (window?.location?.href?.split("?")[1]?.split("code=")[1]) {
       setIsLogging(true);
     }
     getCurrentUser();
-  }, []);
+  }, [getCurrentUser]);
 
   // Generate shape configurations only once with improved animation parameters
   const shapes = useMemo(() => {
     return Array.from({ length: numberOfShapes }, (_, index) => ({
       id: index,
-      size: Math.random() * 5 + 3, // Slightly larger shapes
-      opacity: Math.random() * 0.15 + 0.1, // Slightly more visible
-      startX: Math.random() * 100, // Full width coverage
-      startY: Math.random() * 100, // Full height coverage
+      size: Math.random() * 5 + 3,
+      opacity: Math.random() * 0.15 + 0.1,
+      startX: Math.random() * 100,
+      startY: Math.random() * 100,
       endX: Math.random() * 100,
       endY: Math.random() * 100,
-      duration: Math.random() * 8 + 12, // Slower, more gentle movement
-      delay: index * 0.2, // Faster initial appearance
-      scale: Math.random() * 0.5 + 0.8, // Add size variation during animation
-      rotate: Math.random() * 360, // Add rotation
+      duration: Math.random() * 8 + 12,
+      delay: index * 0.2,
+      scale: Math.random() * 0.5 + 0.8,
+      rotate: Math.random() * 360,
     }));
   }, []);
 
@@ -113,14 +121,19 @@ function StartPage() {
           />
           {userInfo.loggedIn ? (
             <Button
-              className="bg-indigo-600 hover:bg-indigo-700 text-stone-50 font-semibold px-6 py-3 rounded-lg transition-colors"
-              onClick={() => console.log(userInfo)}
+              className="bg-indigo-600 hover:bg-indigo-700 text-stone-50 font-semibold px-6 py-3 rounded-lg transition-colors inline-flex "
+              onClick={() => navigate("/linkedin-bot")}
             >
-              Get Started
+              Continue
+              <span>
+                <ArrowUpRightIcon />
+              </span>
             </Button>
           ) : (
             <Button
-              className="bg-indigo-600 hover:bg-indigo-700 text-stone-50 font-semibold px-6 py-3 rounded-lg transition-colors"
+              className={`bg-indigo-600 hover:bg-indigo-700 text-stone-50 font-semibold px-6 py-3 rounded-lg transition-all duration-500 ease-in-out ${
+                isMounted ? "opacity-100" : "opacity-0"
+              }`}
               onClick={linkedInLogin}
             >
               Sign in with LinkedIn
