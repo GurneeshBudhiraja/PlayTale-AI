@@ -5,8 +5,15 @@ import axios from "axios";
 import { useUserInfoContext } from "../../context/UserInfoContext";
 import { GET_ALL_JOBS } from "../../constants/backendRoute.constants";
 
+// "position": "frontend developer - testing job 3",
+// "companyName": "testing company - testing company 3",
+// "appliedDate": "testing - date 3",
+// "jobUrl": "https://www.gurneesh.com/ - testing 3",
+// "location": "testing location- 3",
+// "_id": "67b9a898002e78a2de8ff83e"
+
 export interface Job {
-  id: string;
+  _id: string;
   position: string;
   companyName: string;
   appliedDate: string;
@@ -117,7 +124,7 @@ function AppliedJobs({
                     <div className="space-y-3">
                       {jobs.map((job) => (
                         <motion.div
-                          key={job.id}
+                          key={job._id}
                           initial={{ opacity: 0, y: 10 }}
                           animate={{ opacity: 1, y: 0 }}
                           className="p-4 rounded-lg bg-zinc-700/20 hover:bg-zinc-700/30 transition-colors border border-zinc-700/50"
