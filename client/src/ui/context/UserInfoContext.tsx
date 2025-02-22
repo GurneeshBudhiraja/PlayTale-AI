@@ -5,6 +5,17 @@ const USER: UserInfoType = {
   name: "",
   picture: "",
   loggedIn: false,
+  userProfile: {
+    completedUserProfile: false,
+    preferredJobTitle: "",
+    linkedInSummary: "",
+    personalWebsiteLink: "",
+    preferredJobCountry: "",
+    profileSummary: "",
+    folderName: "",
+    resumeText: "",
+    coverLetterText: "",
+  },
 };
 
 const UserInfoContext = createContext<UserInfoContextType>({

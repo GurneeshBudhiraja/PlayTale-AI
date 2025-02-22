@@ -6,9 +6,12 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import LinkedInLogin from "../components/LinkedInLogin";
 import { useUserInfoContext } from "../context/UserInfoContext";
 import axios from "axios";
-import { BACKEND_URL } from "../../env";
 import { ArrowUpRightIcon } from "lucide-react";
 import { useNavigate } from "react-router";
+import {
+  GET_LINKEDIN_INFO,
+  GET_USER_PROFILE_INFO,
+} from "../constants/backendRoute.constants";
 
 function StartPage() {
   const { setUserInfo, userInfo } = useUserInfoContext();
@@ -19,34 +22,65 @@ function StartPage() {
 
   const getCurrentUser = useCallback(async () => {
     try {
-      const { data } = await axios.get(`${BACKEND_URL}/linkedin/me`, {
+      const { data } = await axios.get(GET_LINKEDIN_INFO, {
         withCredentials: true,
       });
       const { success, ...info } = data;
       const { email, name, picture } = info as UserInfoType;
+
       if (success) {
-        setUserInfo({
+        setUserInfo((prev) => ({
           email,
+          loggedIn: true,
           name,
           picture,
-          loggedIn: true,
+          userProfile: { ...prev.userProfile },
+        }));
+        const { data } = await axios.get(GET_USER_PROFILE_INFO, {
+          params: {
+            email,
+          },
         });
+        const { success: userProfileSuccess, response } = data as {
+          success: boolean;
+          response: UserProfileType | null;
+        };
+        if (!userProfileSuccess || !response) {
+          setUserInfo((prev) => ({
+            ...prev,
+            userProfile: {
+              ...prev.userProfile,
+              completedUserProfile: false,
+            },
+          }));
+        } else {
+          setUserInfo((prev) => ({
+            ...prev,
+            email,
+            loggedIn: true,
+            name,
+            picture,
+            userProfile: { ...response, completedUserProfile: true },
+          }));
+        }
       } else {
-        setUserInfo({
+        setUserInfo((prev) => ({
+          ...prev,
           email: "",
           loggedIn: false,
           name: "",
           picture: "",
-        });
+        }));
       }
     } catch (error) {
       console.log("Error in getting the current user:", error);
-      setUserInfo({
+      setUserInfo((prev) => ({
+        ...prev,
         email: "",
-        name: "",
         loggedIn: false,
+        name: "",
         picture: "",
-      });
+      }));
     } finally {
       setIsMounted(true);
     }

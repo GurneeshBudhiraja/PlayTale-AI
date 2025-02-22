@@ -3,6 +3,7 @@ interface UserInfoType {
   email: string;
   picture: string;
   loggedIn: boolean;
+  userProfile: UserProfileType
 }
 
 interface UserInfoContextType {
@@ -17,18 +18,14 @@ interface LinkedMeRouteType extends UserInfoType {
 
 
 
-interface JobProfileType {
-  resumeLink: string;
-  coverLetterLink: string;
-  botAssignedFolder: string;
-  userLinkedinProfileInfo: string;
+interface UserProfileType {
+  completedUserProfile: boolean;
+  preferredJobTitle: string;
+  linkedInSummary: string;
   personalWebsiteLink: string;
-  jobLocationCountry: string;
-  jobLocationCity?: string;
-  completed: boolean
-}
-
-interface JobProfileContextType {
-  jobProfile: JobProfileType,
-  setJobProfile: React.Dispatch<React.SetStateAction<JobProfileType>>
+  preferredJobCountry: string;
+  profileSummary: string;
+  folderName: string;
+  resumeText: string;
+  coverLetterText: string;
 }

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Text from "./Text";
 import Button from "./Button";
 import { useUserInfoContext } from "../context/UserInfoContext";
@@ -9,9 +9,7 @@ const menuOptions = [
   {
     optionName: "My Profile Settings",
     className: "text-gray-700 hover:text-indigo-600 font-medium",
-    onClick: () => {
-      console.log("hello ");
-    },
+    onClick: () => {},
   },
   {
     optionName: "Sign Out",
@@ -56,27 +54,18 @@ function Header() {
       </Link>
       <div ref={profileMenuRef}>
         <Button onClick={() => setShowMenu(!showMenu)}>
-          {userInfo.picture ? (
-            <img
-              width={32}
-              height={32}
-              src={
-                userInfo.picture ||
-                "https://avatars.githubusercontent.com/u/140137709?s=400&u=dd7f429eed3ace708c5353bc49ce420b361a025f&v=4"
-              }
-              alt="Profile icon"
-              className="rounded-full"
-            />
-          ) : (
-            <CircleUserRound
-              width={35}
-              height={35}
-              className="text-indigo-300"
-            />
-          )}
+          <CircleUserRound width={35} height={35} className="text-indigo-300" />
         </Button>
         {showMenu && (
           <div className="bg-indigo-100 absolute right-20 mt-2 py-2 w-48 rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+            {userInfo.name && (
+              <Button
+                className={`block w-full text-left px-4 py-2 text-sm text-indigo-600 font-medium`}
+                key={"name"}
+              >
+                Welcome back, {userInfo.name}
+              </Button>
+            )}
             {menuOptions.map((option, index) => (
               <Button
                 className={`${option.className} block w-full text-left px-4 py-2 text-sm`}

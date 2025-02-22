@@ -20,10 +20,14 @@ function BotPage() {
     <div className="max-h-full overflow-auto">
       {/* Header */}
       <Header />
-      <div className="max-w-6xl mx-auto px-8 mt-10 space-y-4 select-none">
-        <BotStatus jobsCount={jobsCount} />
-        <AppliedJobs setJobsCount={setJobsCount} />
-      </div>
+      {userInfo.userProfile.completedUserProfile ? (
+        <div className="max-w-6xl mx-auto px-8 mt-10 space-y-4 select-none">
+          <BotStatus jobsCount={jobsCount} />
+          <AppliedJobs setJobsCount={setJobsCount} />
+        </div>
+      ) : (
+        <>Onboarding screeen</>
+      )}
     </div>
   );
 }
