@@ -21,7 +21,6 @@ interface LinkedMeRouteType extends UserInfoType {
 interface UserProfileType {
   completedUserProfile: boolean;
   preferredJobTitle: string;
-  linkedInSummary: string;
   personalWebsiteLink: string;
   preferredJobCountry: string;
   profileSummary: string;

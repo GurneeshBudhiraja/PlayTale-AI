@@ -13,11 +13,6 @@ const UserProfileSchema = new mongoose.Schema({
     trim: true,
     required: true,
   },
-  linkedInSummary: {
-    type: String,
-    trim: true,
-    required: true,
-  },
   personalWebsiteLink: {
     type: String,
     trim: true,

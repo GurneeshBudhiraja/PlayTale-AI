@@ -13,24 +13,20 @@ function StartPage() {
   const numberOfShapes = 25;
   const [isLogging, setIsLogging] = useState<boolean>(false);
   const navigate = useNavigate();
-  const [mounted, setMounted] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    if (!mounted) {
-      setMounted(true);
-      return;
-    }
-
     if (window?.location?.href?.split("?")[1]?.split("code=")[1]) {
       setIsLogging(true);
     }
 
     async function getUser() {
       await getCurrentUserInfo({ setUserInfo });
+      setIsLoading(false);
     }
 
     getUser();
-  }, [setUserInfo, mounted]);
+  }, [setUserInfo]);
 
   // Generate shape configurations only once with improved animation parameters
   const shapes = useMemo(() => {
@@ -92,24 +88,25 @@ function StartPage() {
             className="text-2xl bg-clip-text bg-gradient-to-r from-indigo-200 via-indigo-300 to-indigo-400 text-transparent shadow-2xl"
             textContent="Land your dream job, on autopilot."
           />
-          {userInfo.loggedIn ? (
-            <Button
-              className="bg-indigo-600 hover:bg-indigo-700 text-stone-50 font-semibold px-6 py-3 rounded-lg transition-colors inline-flex "
-              onClick={() => navigate("/linkedin-bot")}
-            >
-              Continue
-              <span>
-                <ArrowUpRightIcon />
-              </span>
-            </Button>
-          ) : (
-            <Button
-              className={`bg-indigo-600 hover:bg-indigo-700 text-stone-50 font-semibold px-6 py-3 rounded-lg transition-all duration-500 ease-in-out`}
-              onClick={linkedInLogin}
-            >
-              Sign in with LinkedIn
-            </Button>
-          )}
+          {!isLoading &&
+            (userInfo.loggedIn ? (
+              <Button
+                className="bg-indigo-600 hover:bg-indigo-700 text-stone-50 font-semibold px-6 py-3 rounded-lg transition-colors inline-flex "
+                onClick={() => navigate("/linkedin-bot")}
+              >
+                Continue
+                <span>
+                  <ArrowUpRightIcon />
+                </span>
+              </Button>
+            ) : (
+              <Button
+                className={`bg-indigo-600 hover:bg-indigo-700 text-stone-50 font-semibold px-6 py-3 rounded-lg transition-all duration-500 ease-in-out`}
+                onClick={linkedInLogin}
+              >
+                Sign in with LinkedIn
+              </Button>
+            ))}
         </div>
       )}
     </div>

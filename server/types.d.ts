@@ -6,7 +6,5 @@ interface UserProfileType {
   userLinkedinProfileInfo: string;
   personalWebsiteLink: string;
   jobLocationCountry: string;
-  jobLocationCity?: string;
   aiProfileSummary: string;
-  githubAccountUrl: string;
 }

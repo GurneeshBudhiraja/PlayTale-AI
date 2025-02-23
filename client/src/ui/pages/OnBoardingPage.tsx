@@ -69,15 +69,6 @@ function OnBoardingPage() {
         />
 
         <FormInput
-          labelText="LinkedIn Summary"
-          inputType="text"
-          inputId="linkedInSummary"
-          inputClassName={inputClasses}
-          labelClassName={labelClasses}
-          inputPlaceholder="Brief professional summary"
-        />
-
-        <FormInput
           labelText="Personal Website"
           inputType="url"
           inputId="personalWebsiteLink"
