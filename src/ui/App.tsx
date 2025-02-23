@@ -3,6 +3,7 @@ import { BrowserRouter, Route, Routes } from "react-router";
 import StartPage from "./pages/StartPage";
 import ThemeSelector from "./pages/ThemeSelector";
 import GamePreferencesContextWrapper from "./context/GameContext";
+import GameScreen from "./pages/GameScreen";
 
 function App() {
   return (
@@ -26,6 +27,7 @@ function App() {
           <Routes>
             <Route path="/" element={<StartPage />} />
             <Route path="/theme" element={<ThemeSelector />} />
+            <Route path="/game" element={<GameScreen />} />
           </Routes>
         </motion.div>
       </BrowserRouter>

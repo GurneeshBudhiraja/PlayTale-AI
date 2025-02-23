@@ -77,7 +77,7 @@ function StartPage() {
           textContent="Play. Create. Explore your own tales."
         />
         <Button
-          className="px-8 py-4 text-xl font-bold text-white bg-gradient-to-r from-indigo-500 via-indigo-600 to-indigo-700 rounded-full border-b-8 border-indigo-900 active:border-b-2 active:translate-y-1.5 transition-all duration-100 shadow-lg"
+          className="px-8 py-4 text-xl font-bold text-white bg-gradient-to-r from-indigo-500 via-indigo-600 to-indigo-700 rounded-full shadow-[3px_2px_0px_white] active:shadow-none active:translate-1 w-1/4"
           onClick={() => {
             if (buttonClickSoundRef.current) buttonClickSoundRef.current.play();
             setTimeout(() => navigate("/theme"), 500);

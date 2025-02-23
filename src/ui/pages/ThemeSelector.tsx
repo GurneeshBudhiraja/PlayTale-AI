@@ -3,10 +3,13 @@ import Header from "../components/Header";
 import Button from "../components/Button";
 import { Joystick, Skull, Sun, Sword } from "lucide-react";
 import { useGamePreferencesContext } from "../context/GameContext";
+import React from "react";
+import { useNavigate } from "react-router";
 
 function ThemeSelector() {
   const { gamePreferences, setGamePreferences } = useGamePreferencesContext();
-
+  const buttonClickSoundRef = React.useRef<HTMLAudioElement>(null);
+  const navigate = useNavigate();
   const themes = [
     {
       id: "fun",
@@ -159,25 +162,29 @@ function ThemeSelector() {
                     [&::-webkit-slider-thumb]:shadow-lg"
             />
           </div>
-
-          <motion.div
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            className="flex justify-center"
-          >
-            <Button
-              onClick={() => console.log(gamePreferences)}
-              className="w-full md:w-64 bg-indigo-500/90 hover:bg-indigo-400/90 text-zinc-100 
-                font-bold py-3 px-8 rounded-xl transition-all duration-200
-                border-2 border-indigo-400/50 hover:border-indigo-300/50
-                shadow-lg hover:shadow-indigo-500/20
-                text-lg flex items-center justify-center gap-2"
-            >
-              <span className="animate-pulse">▶</span>
-              Begin Adventure
-            </Button>
-          </motion.div>
         </motion.div>
+        {/* Begin Adventure button */}
+        <div className="flex justify-center mt-3">
+          <Button
+            onClick={() => {
+              console.log(gamePreferences);
+              buttonClickSoundRef.current?.play();
+              setTimeout(() => navigate("/game"), 500);
+            }}
+            className="w-full md:w-64 bg-indigo-500/90 hover:bg-indigo-400/90 text-zinc-100 
+        font-bold py-3 px-8 rounded-xl transition-all duration-200
+        border-2 border-indigo-400/50 hover:border-indigo-300/50
+        text-lg flex items-center justify-center gap-2 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-zinc-900 shadow-[5px_3px_0px_white] active:shadow-none active:translate-1"
+          >
+            <span className="animate-pulse">▶</span>
+            Begin Adventure
+            <audio
+              src="/button-click-sound.mp3"
+              ref={buttonClickSoundRef}
+              hidden={true}
+            />
+          </Button>
+        </div>{" "}
       </div>
     </div>
   );
