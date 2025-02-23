@@ -4,6 +4,7 @@ import AppliedJobs from "../components/BotPageComponents/AppliedJobs";
 import { useEffect, useState } from "react";
 import { useUserInfoContext } from "../context/UserInfoContext";
 import { useNavigate } from "react-router";
+import OnBoardingPage from "./OnBoardingPage";
 
 function BotPage() {
   const [jobsCount, setJobsCount] = useState<number | null>(null);
@@ -20,14 +21,16 @@ function BotPage() {
     <div className="max-h-full overflow-auto">
       {/* Header */}
       <Header />
-      {userInfo.userProfile.completedUserProfile ? (
-        <div className="max-w-6xl mx-auto px-8 mt-10 space-y-4 select-none">
-          <BotStatus jobsCount={jobsCount} />
-          <AppliedJobs setJobsCount={setJobsCount} />
-        </div>
-      ) : (
-        <>Onboarding screeen</>
-      )}
+      <div className="max-w-6xl mx-auto px-8 mt-10 space-y-4 select-none">
+        {userInfo.userProfile.completedUserProfile ? (
+          <>
+            <BotStatus jobsCount={jobsCount} />
+            <AppliedJobs setJobsCount={setJobsCount} />
+          </>
+        ) : (
+          <OnBoardingPage />
+        )}
+      </div>
     </div>
   );
 }

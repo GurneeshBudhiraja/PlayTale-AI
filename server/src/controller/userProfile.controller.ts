@@ -21,11 +21,17 @@ export async function createUserProfile(req: Request, res: Response) {
         body[key as keyof typeof body] = (body[key as keyof typeof body] as string).trim()
       }
     })
-
-    const response = await (new UserProfile({
+    const findResponse = await UserProfile.findOne({ email: body.email })
+    if (findResponse !== null) {
+      res.status(409).json({
+        success: false,
+        message: "Profile already exists using this email"
+      })
+      return;
+    }
+    await (new UserProfile({
       ...body
     })).save()
-    console.log("response:", response)
     session.commitTransaction()
     res.status(200).json({
       success: true,
@@ -48,7 +54,6 @@ export async function createUserProfile(req: Request, res: Response) {
 export async function getUserProfile(req: Request, res: Response) {
   try {
     const email = (req.query.email as string)?.trim();
-    console.log(req.params)
     if (!email) {
       res.status(400).json({
         success: false,
@@ -56,8 +61,7 @@ export async function getUserProfile(req: Request, res: Response) {
       })
       return;
     }
-    const response = await UserProfile.findOne({ email }, { __v: 0, _id: 0, email:0 })
-    console.log(response)
+    const response = await UserProfile.findOne({ email }, { __v: 0, _id: 0, email: 0 })
     res.status(200).json({
       success: true,
       response,
