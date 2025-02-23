@@ -1,6 +1,8 @@
 import React from "react";
 import { LINKEDIN_REDIRECT_URI } from "./env";
 import pdfToText from "react-pdftotext";
+import axios from "axios";
+import { GET_LINKEDIN_INFO, GET_USER_PROFILE_INFO } from "./ui/constants/backendRoute.constants";
 
 
 export async function linkedInLogin() {
@@ -30,4 +32,51 @@ export async function extractText(e: React.ChangeEvent<HTMLInputElement>, setPdf
     [category]: fileText || ""
   }))
   return;
+}
+
+
+export async function getCurrentUserInfo({
+  setUserInfo,
+}: {
+  setUserInfo: React.Dispatch<React.SetStateAction<UserInfoType>>;
+}) {
+  const { data } = await axios.get(GET_LINKEDIN_INFO, {
+    withCredentials: true,
+  });
+  const { success, ...userInfo } = data as Omit<LinkedMeRouteType, "loggedIn">;
+  if (success) {
+    // Updates the userInfo state once the user info has been collected from the backend
+    setUserInfo({
+      ...userInfo,
+      userProfile: {
+        ...userInfo.userProfile,
+      },
+      loggedIn: true,
+    });
+    const { data } = await axios.get(GET_USER_PROFILE_INFO, {
+      params: {
+        email: userInfo.email,
+      },
+    });
+    const { response } = data as {
+      success: boolean;
+      response: Omit<UserProfileType, "completedUserProfile">;
+    };
+    if (!response) {
+      setUserInfo((prev) => ({
+        ...prev,
+        userProfile: {
+          ...prev.userProfile,
+        },
+      }));
+    } else {
+      setUserInfo((prev) => ({
+        ...prev,
+        userProfile: {
+          completedUserProfile: true,
+          ...response,
+        },
+      }));
+    }
+  }
 }

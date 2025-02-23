@@ -1,9 +1,10 @@
 import React, { useEffect } from "react";
 import { Loader2 } from "lucide-react";
 import axios from "axios";
-import { BACKEND_URL } from "../../env";
 import { useNavigate } from "react-router";
 import { useUserInfoContext } from "../context/UserInfoContext";
+import { LINKEDIN_LOGIN } from "../constants/backendRoute.constants";
+import { getCurrentUserInfo } from "../../utils";
 
 function LinkedInLogin({
   setIsLogging,
@@ -12,12 +13,13 @@ function LinkedInLogin({
 }) {
   const navigate = useNavigate();
   const { setUserInfo } = useUserInfoContext();
+
   async function getAccessToken() {
     const code = window?.location?.href?.split("?")[1]?.split("code=")[1];
-    console.log(code);
     try {
+      // Generates the access token and stores in the cookies
       const { data } = await axios.post(
-        `${BACKEND_URL}/linkedin/login`,
+        LINKEDIN_LOGIN,
         {
           code,
         },
@@ -33,19 +35,8 @@ function LinkedInLogin({
         message: string;
       };
       if (success) {
-        const { data } = await axios.get(`${BACKEND_URL}/linkedin/me`, {
-          withCredentials: true,
-        });
-        const { success, ...userInfo } = data as Omit<
-          LinkedMeRouteType,
-          "loggedIn"
-        >;
-        if (success) {
-          setUserInfo({
-            ...userInfo,
-            loggedIn: true,
-          });
-        }
+        // Gets the current logged in user info after the access token has been generated
+        await getCurrentUserInfo({ setUserInfo });
       }
     } catch (error) {
       console.log("Error getting the access token:", error);
@@ -54,6 +45,17 @@ function LinkedInLogin({
         email: "",
         name: "",
         picture: "",
+        userProfile: {
+          completedUserProfile: false,
+          preferredJobTitle: "",
+          linkedInSummary: "",
+          personalWebsiteLink: "",
+          preferredJobCountry: "",
+          profileSummary: "",
+          folderName: "",
+          resumeText: "",
+          coverLetterText: "",
+        },
       });
     } finally {
       setIsLogging(false);
