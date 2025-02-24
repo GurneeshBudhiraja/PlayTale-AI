@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 import Header from "../components/Header";
 import Button from "../components/Button";
 import { Joystick, Skull, Sun, Sword } from "lucide-react";
-import { useGamePreferencesContext } from "../context/GameContext";
+import { useGamePreferencesContext } from "../context/GamePreferencesContext";
 import React from "react";
 import { useNavigate } from "react-router";
 

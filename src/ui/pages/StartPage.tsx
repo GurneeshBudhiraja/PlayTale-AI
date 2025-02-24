@@ -3,7 +3,7 @@ import Text from "../components/Text";
 import { motion } from "framer-motion";
 import { useEffect, useMemo, useRef } from "react";
 import { useNavigate } from "react-router";
-import { useGamePreferencesContext } from "../context/GameContext";
+import { useGamePreferencesContext } from "../context/GamePreferencesContext";
 
 function StartPage() {
   const numberOfShapes = 25;

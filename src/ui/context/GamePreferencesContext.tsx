@@ -3,7 +3,7 @@ import { createContext, useContext, useState } from "react";
 const GAME_PREFERENCES: GameType = {
   age: 12,
   customTheme: "",
-  selectedTheme: "fun",
+  selectedTheme: null,
 };
 
 const GamePreferencesContext = createContext<GameContextType>({

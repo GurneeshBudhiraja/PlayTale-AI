@@ -14,8 +14,8 @@ explorations
 node_modules
 playground-temp
 temp
-TODOs.md
 .eslintcache
 dist-electron/
 .env
 client/
+todo.yaml
