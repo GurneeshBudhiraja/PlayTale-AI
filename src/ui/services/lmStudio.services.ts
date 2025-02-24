@@ -36,15 +36,38 @@ export async function getCompletion(userPrompt: string, age: number, modelName: 
       },
       { "role": "user", "content": `Create a plot for: ${userPrompt}` }
     ],
+    response_format: {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "story_starter_response",
+        "strict": "true",
+        "schema": {
+          "type": "object",
+          "properties": {
+            "talePlot": {
+              "type": "string",
+              "description": "The generated story plot"
+            },
+            "taleName": {
+              "type": "string",
+              "description": "The generated name for the story"
+            }
+          },
+          "required": ["talePlot", "taleName"]
+        }
+      }
+    },
     temperature: 0.7,
     stream: false
   };
 
-  return await axios.post(`${LM_STUDIO_URL}/v1/chat/completions`, data, {
+  const response = await axios.post(`${LM_STUDIO_URL}/v1/chat/completions`, data, {
     headers: {
       'Content-Type': 'application/json'
     }
   });
+  console.log(response)
+  return JSON.parse(response.data.choices[0].message.content)
 }
 
 
@@ -133,6 +156,114 @@ export async function generateTaleCharacters(talePlot: string, modelName: string
     return (JSON.parse(response.data.choices[0].message.content))
   } catch (error) {
     console.error('Error generating characters:', error);
+  }
+}
+
+
+export async function generateTaleConversaton({
+  messages,
+  talePlot,
+  characters,
+}: {
+  messages: string;
+  talePlot: string;
+  characters: GameScreenCharacterType[]
+}) {
+  const data = {
+    model: MODEL,
+    messages: [
+      {
+        "role": "system",
+        "content": `You are a storytelling assistant that generates interactive conversations for a story-based game.
+
+### Guidelines:
+- Generate an array of objects, with each object representing a dialogue turn.
+- Each dialogue turn object should have a 'name' and a 'message' property.
+- The 'name' property should match one of the provided characters.
+- If the 'messages' array is empty, generate a starting scene based on the 'talePlot'.
+- If the 'messages' array is not empty, continue the conversation based on the previous messages.
+- Never generate dialogue for the character with the role 'protagonist'.
+- The generated dialogue should be engaging, detailed (at least 3 sentences per message), and appropriate for the user's age.
+- The story should be exciting and unpredictable, with unexpected turns that match the theme.
+- Build upon the story using the provided 'talePlot' and 'messages' for context.
+
+### Examples:
+
+**Example 1 (Starting Scene):**
+talePlot: A group of friends discover a hidden portal in their school's library that leads to a magical world.
+messages:
+characters: [
+  { "name": "Alex", "role": "protagonist" },
+  { "name": "Lily", "role": "supporting" },
+  { "name": "Sam", "role": "supporting" }
+]
+Generated Dialogue:
+[
+  { "name": "Lily", "message": "Wow, look at this old book! It has a strange symbol on it. I wonder if it's related to the rumors about a secret passage in the library.  Maybe it leads to another world, like in that movie we watched!" },
+  { "name": "Sam", "message": "Don't be silly, Lily. It's probably just an old library book. But hey, we could try to decipher the symbol. Maybe it's a code or something.  Let's see if we can find any clues around here!" }
+]
+
+**Example 2 (Continuing Conversation):**
+talePlot: A lone hiker gets lost in a haunted forest and must survive the night while being hunted by a mysterious creature.
+messages: [
+  { "name": "Emily", "message": "I think I'm lost. I should have stayed on the trail." },
+  { "name": "The Beast", "message": "Grrr..." }
+]
+characters: [
+  { "name": "Emily", "role": "protagonist" },
+  { "name": "The Beast", "role": "supporting" }
+]
+Generated Dialogue:
+[
+  { "name": "The Beast", "message": "Emily... I can hear your heartbeat... It's getting closer.  You can't hide from me. The forest is mine, and soon, you will be too." }
+]
+
+Now, generate the dialogue for the following context.`
+      },
+      {
+        "role": "user",
+        "content": `Generate dialogue for the following:
+        talePlot: ${talePlot}
+        messages: ${JSON.stringify(messages)}
+        characters: ${JSON.stringify(characters)}`
+      }
+    ],
+    response_format: {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "dialogue_response",
+        "strict": "true",
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "message": {
+                "type": "string"
+              }
+            },
+            "required": ["name", "message"]
+          }
+        }
+      }
+    },
+    temperature: 0.7,
+    stream: false
+  };
+
+
+  try {
+    const response = await axios.post(`${LM_STUDIO_URL}/v1/chat/completions`, data, {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+    return (JSON.parse(response.data.choices[0].message.content))
+  } catch (error) {
+    console.error('Error generating the the tale conversation:', error);
   }
 }
 

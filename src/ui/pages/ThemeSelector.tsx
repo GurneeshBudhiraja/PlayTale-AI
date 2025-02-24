@@ -40,6 +40,7 @@ function ThemeSelector() {
   return (
     <div className="overflow-auto h-full">
       <Header />
+      <button onClick={() => console.log(gameScreeen)}>Click</button>
       <div className="max-w-4xl mx-auto px-4 ">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -182,7 +183,7 @@ function ThemeSelector() {
                 ...prev,
                 gameScreenLoading: false,
               }));
-              // navigate("/game");
+              navigate("/game");
             }}
             className="w-full md:w-64 bg-indigo-500/90 hover:bg-indigo-400/90 text-zinc-100 
         font-bold py-3 px-8 rounded-xl transition-all duration-200

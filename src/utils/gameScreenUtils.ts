@@ -1,4 +1,4 @@
-import { generateTaleCharacters, getCompletion } from "../ui/services/lmStudio.services";
+import { generateTaleCharacters, generateTaleConversaton, getCompletion } from "../ui/services/lmStudio.services";
 
 /* 
   Generate plot for the tale when the user selected any one of default themes
@@ -7,7 +7,7 @@ import { generateTaleCharacters, getCompletion } from "../ui/services/lmStudio.s
 */
 export async function generatePlot(theme: SelectedTheme | string, age: number) {
   try {
-    return (await getCompletion(theme, age)).data.choices[0].message.content
+    return (await getCompletion(theme, age))
   } catch (error) {
     console.log("Error generating the plot based on the theme", error);
     return "";
@@ -29,23 +29,34 @@ export async function generateCharacters(talePlot: string): Promise<GameScreenCh
 
 
 /*
-  Generates the first scene of the game
+  Generates the scene of the game
 */
-export async function generateFirstScene() {
-
-  // creates a title, a setting of the scene for the user, initial dialogs and other stuff for the first time theme
-  return {};
+export async function generateScene({
+  messages,
+  talePlot,
+  characters,
+}: {
+  messages: string;
+  talePlot: string;
+  characters: GameScreenCharacterType[]
+}) {
+  console.log({
+    messages,
+    talePlot,
+    characters
+  })
+  try {
+    return (await generateTaleConversaton({ messages, characters, talePlot }));
+  } catch (error) {
+    console.log(error)
+    return []
+  }
 }
 
-/*
-  Generates subsequent scenes for the user
-*/
-export async function generateSubsequentScenes() {
-  // Generates subsequent scenes for the game
-  return {}
-}
+
 
 export async function generateTaleSceneImage() {
-  // Generates a new image 
+  // Generates a new image based on the scene
   return "image"
 }
+

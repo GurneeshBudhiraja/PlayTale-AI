@@ -27,15 +27,15 @@ interface GameScreenCharacterType {
 interface Tale {
   talePlot: string;
   taleCharacters: Array<GameScreenCharacterType>;
-  taleTitle: string;
   firstScene: boolean;
+  taleName: string;
+  taleMessages: string;
 }
 
 
 interface GameScreenType {
   gameScreenLoading: boolean;
   gameScreenNextButton: boolean;
-  gameScreenMessageHistory: Array<GameScreenMessage>;
   tale: Tale;
 }
 

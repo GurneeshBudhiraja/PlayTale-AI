@@ -3,12 +3,12 @@ import React, { createContext, useContext, useState } from "react";
 const GAME_SCREEN: GameScreenType = {
   gameScreenLoading: false,
   gameScreenNextButton: false,
-  gameScreenMessageHistory: [],
   tale: {
     talePlot: "",
     taleCharacters: [],
-    taleTitle: "",
     firstScene: true,
+    taleName: "",
+    taleMessages: "",
   },
 };
 

@@ -1,5 +1,5 @@
 
-import { generateCharacters, generateFirstScene, generatePlot, generateSubsequentScenes, generateTaleSceneImage } from "../../utils/gameScreenUtils"
+import { generateCharacters, generatePlot } from "../../utils/gameScreenUtils"
 
 export default async function gameScreenManager({
   gameScreeen,
@@ -16,35 +16,44 @@ export default async function gameScreenManager({
     taleCharacters: tale.taleCharacters,
     // talePlot: tale.talePlot,
     talePlot: "",
-    taleTitle: tale.taleTitle,
-    firstScene: tale.firstScene
+    taleName: "",
+    firstScene: tale.firstScene,
+    taleMessages: ""
   }
 
   try {
-    // When default theme(selectedTheme) has been selected by the user and talePlot is empty string
+    // Generates the tale plot when firstScene is set to true
     if (tale.firstScene) {
-      let tempTalePlot: string;
+      const tempObj = {
+        tempTalePlot: "",
+        tempTaleName: ""
+      }
       if (gamePreferences.selectedTheme) {
         console.log(gamePreferences.selectedTheme)
         // Generates a new plot based on the selected default theme
-        tempTalePlot = await generatePlot(gamePreferences.selectedTheme, gamePreferences.age)
+        const { talePlot, taleName } = await generatePlot(gamePreferences.selectedTheme, gamePreferences.age) as { talePlot: string, taleName: string }
+        tempObj["tempTalePlot"] = talePlot
+        tempObj["tempTaleName"] = taleName
       } else {
         console.log(gamePreferences.customTheme)
-        tempTalePlot = await generatePlot(gamePreferences.customTheme, gamePreferences.age)
+        const { talePlot, taleName } = await generatePlot(gamePreferences.customTheme, gamePreferences.age) as { talePlot: string, taleName: string }
+        tempObj["tempTalePlot"] = talePlot
+        tempObj["tempTaleName"] = taleName
       }
 
       // Checks for the empty talePlot and throws an error on empty talePlot
-      if (!tempTalePlot) {
-        throw new Error("talePlot is missing. Redirecting the user to /theme route in 2000ms")
+      if (!tempObj["tempTaleName"] || !tempObj["tempTalePlot"]) {
+        throw new Error("talePlot/taleName is missing. Redirecting the user to /theme route in 2000ms")
       }
 
       // Updates the tempTaleObject with the new talePlot
-      tempTaleObject["talePlot"] = tempTalePlot.trim()
+      tempTaleObject["talePlot"] = tempObj.tempTalePlot.trim()
+      tempTaleObject["taleName"] = tempObj.tempTaleName.trim()
     }
-    console.log("Tale plot:")
+    console.log("Tale plot and name:")
     console.log(tempTaleObject)
 
-    // Generate new set of characters when the taleCharacters array is empty
+    // Generates characters' name and role when firstScene is set to true
     if (tale.firstScene && !tale.taleCharacters.length) {
       console.log("generating characs")
       console.log(tempTaleObject["talePlot"])
@@ -57,25 +66,18 @@ export default async function gameScreenManager({
     }
     console.log("Tale characters:")
     console.log(tempTaleObject)
-
-    if (tale.firstScene) {
-      // TODO: will come later on and modify this, since this would contain an object like title, firstScene, context, and other stuff of the game. Then we would also, go and update the context accordingly.
-      const firstScene = await generateFirstScene();
-      if (!firstScene) {
-        throw new Error("Failed to create first scene")
+    setGameScreen((prev) => ({
+      ...prev,
+      tale: {
+        ...prev.tale,
+        firstScene: false,
+        taleCharacters: tempTaleObject.taleCharacters,
+        taleName: tempTaleObject.taleName,
+        talePlot: tempTaleObject.talePlot,
       }
-      // todo: update the context with the first scene
-      tale.firstScene = false;
-    } else if (!tale.firstScene) {
-      // TODO: generate subsequent themes based on the past messages, plot, characters and other attributes. 
-      await generateSubsequentScenes()
-      // TODO: then generate a new scene
-    }
+    }))
 
-    // TODO: will be used to generate new subsequent scene
-    const sceneImage = generateTaleSceneImage()
-
-    // TODO: Update the context at the end
+    console.log("Process completed")
 
   } catch (error) {
     console.log("Error:", error)
@@ -85,9 +87,9 @@ export default async function gameScreenManager({
       // Default theme
       selectedTheme: null
     })
-    // setTimeout(() => {
-    //   window.location.href = "/theme"
-    // }, 2000);
+    setTimeout(() => {
+      window.location.href = "/theme"
+    }, 2000);
     return;
   }
 }
