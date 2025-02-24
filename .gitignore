@@ -17,3 +17,5 @@ temp
 TODOs.md
 .eslintcache
 dist-electron/
+.env
+client/

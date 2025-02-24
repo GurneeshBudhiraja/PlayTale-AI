@@ -1,8 +1,16 @@
 import { motion } from "framer-motion";
 import Header from "../components/Header";
 import Button from "../components/Button";
+import { useState } from "react";
+import { getCompletion } from "../services/lmStudio";
 
 function GameScreen() {
+  const [userResponse, setUserResponse] = useState<string>("");
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    const completionResponse = await getCompletion(userResponse);
+    console.log(completionResponse.data.choices[0].message.content);
+  }
   return (
     <div className="h-full overflow-hidden">
       <Header />
@@ -60,22 +68,29 @@ function GameScreen() {
             transition={{ delay: 0.3 }}
             className="sticky bottom-0 backdrop-blur-sm pt-4"
           >
-            <div className="flex gap-3">
-              <input
-                type="text"
-                placeholder="Speak your purpose..."
-                className="w-full px-4 py-3 bg-zinc-800/50 border border-zinc-700 rounded-lg 
+            <form onSubmit={handleSubmit}>
+              <div className="flex gap-3">
+                <input
+                  type="text"
+                  placeholder="Speak your purpose..."
+                  className="w-full px-4 py-3 bg-zinc-800/50 border border-zinc-700 rounded-lg 
                   text-zinc-200 placeholder-zinc-500 focus:outline-none focus:ring-2 
                   focus:ring-indigo-500/50 transition-all"
-              />
-              <Button
-                className="px-6 bg-indigo-500/90 hover:bg-indigo-400/90 text-zinc-100 
+                  value={userResponse}
+                  onChange={(e) => setUserResponse(e.target.value)}
+                />
+                <Button
+                  className="px-6 bg-indigo-500/90 hover:bg-indigo-400/90 text-zinc-100 
                 font-medium rounded-lg transition-colors duration-200 flex items-center gap-2"
-              >
-                <span>Send</span>
-                <span className="text-lg -mt-1">→</span>
-              </Button>
-            </div>
+                  buttonProps={{
+                    type: "submit",
+                  }}
+                >
+                  <span>Send</span>
+                  <span className="text-lg -mt-1">→</span>
+                </Button>
+              </div>
+            </form>
             <p className="text-zinc-500 text-sm mt-2">
               Type your response to continue the story...
             </p>
