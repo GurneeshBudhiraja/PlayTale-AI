@@ -10,6 +10,7 @@ function GameScreen() {
   const { gameScreeen } = useGameScreenContext();
   const navigate = useNavigate();
   useEffect(() => {
+    // Navigate to "/" route if taleName is not present
     if (!gameScreeen.tale.taleName) navigate("/");
   }, [navigate, gameScreeen.tale.taleName]);
   return (

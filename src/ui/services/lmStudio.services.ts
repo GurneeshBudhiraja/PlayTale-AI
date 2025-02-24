@@ -164,70 +164,88 @@ export async function generateTaleConversaton({
   messages,
   talePlot,
   characters,
+  model = MODEL,
 }: {
   messages: string;
   talePlot: string;
-  characters: GameScreenCharacterType[]
+  characters: GameScreenCharacterType[];
+  model?: string;
 }) {
+  console.log("Data in generateTaleConversaton")
+  console.log({
+    messages,
+    model,
+    talePlot,
+    characters,
+  })
+  console.log("Generating...")
   const data = {
-    model: MODEL,
+    model,
+    // Prompt for the AI
     messages: [
       {
         "role": "system",
-        "content": `You are a storytelling assistant that generates interactive conversations for a story-based game.
+        "content": `
+          You are a storytelling assistant that generates interactive dialogues for a story-based game. Your goal is to create compelling, engaging, and immersive conversations based on the provided story plot, character details, and message history.
 
-### Guidelines:
-- Generate an array of objects, with each object representing a dialogue turn.
-- Each dialogue turn object should have a 'name' and a 'message' property.
-- The 'name' property should match one of the provided characters.
-- If the 'messages' array is empty, generate a starting scene based on the 'talePlot'.
-- If the 'messages' array is not empty, continue the conversation based on the previous messages.
-- Never generate dialogue for the character with the role 'protagonist'.
-- The generated dialogue should be engaging, detailed (at least 3 sentences per message), and appropriate for the user's age.
-- The story should be exciting and unpredictable, with unexpected turns that match the theme.
-- Build upon the story using the provided 'talePlot' and 'messages' for context.
+          ### **Instructions:**
+          - Use the **talePlot** as the foundation for the dialogue. The story's theme, setting, and ongoing events should influence the conversation.
+          - The **characters** array lists all characters in the story. However, you must **only generate messages for supporting characters**, never for the protagonist.
+          - The **messages** history contains previous dialogues. Use this context to maintain continuity in conversations.
+          - If the **messages** array is empty, you must generate the **starting messages** to initiate the conversation.
+          - The dialogue should feel **natural, open-ended, and engaging**, fitting the tone of a narrative-driven game.
+          - Stick to the theme and use the last message in the messages string as the latest message from the user. If no message is present, then that means the conversation has just started.
+          
+          Example 1 when messages are empty: 
+          Sample input 1: {
+            "talePlot": "In a small village where happiness is measured by laughter and shared meals, an elderly woman named Mrs. Willow notices that her once-vibrant garden has turned lifeless. Determined to bring joy back to the community, she begins planting seeds of hope in the soil, one by one.",
+            "characters": [
+              { "name": "Mrs. Willow", "role": "protagonist" },
+              { "name": "Young Lily", "role": "supporting" },
+              { "name": "Mayor Hawthorne", "role": "supporting" }
+            ],
+            "messages": ""
+          }
 
-### Examples:
+          Sample output 1:
+          [
+            {
+              "name": "Young Lily",
+              "message": "Mrs. Willow, I saw you in the garden today… but nothing ever grows there anymore. Why do you keep trying?"
+            },
+            {
+              "name": "Mayor Hawthorne",
+              "message": "The people of this village have lost faith, Mrs. Willow. What do you hope to change?"
+            }
+          ]
+          
+          Example 2 when messages exists: 
+          Sample input 2: {
+            "talePlot": "A lonely inventor creates an artificial sun to bring light to his underground city, but as the machine gains awareness, it begins questioning its purpose.",
+          "characters": [
+            { "name": "Dr. Vance", "role": "protagonist" },
+            { "name": "ECHO-7", "role": "supporting" },
+            { "name": "Mayor Graves", "role": "supporting" }
+          ],
 
-**Example 1 (Starting Scene):**
-talePlot: A group of friends discover a hidden portal in their school's library that leads to a magical world.
-messages:
-characters: [
-  { "name": "Alex", "role": "protagonist" },
-  { "name": "Lily", "role": "supporting" },
-  { "name": "Sam", "role": "supporting" }
-]
-Generated Dialogue:
-[
-  { "name": "Lily", "message": "Wow, look at this old book! It has a strange symbol on it. I wonder if it's related to the rumors about a secret passage in the library.  Maybe it leads to another world, like in that movie we watched!" },
-  { "name": "Sam", "message": "Don't be silly, Lily. It's probably just an old library book. But hey, we could try to decipher the symbol. Maybe it's a code or something.  Let's see if we can find any clues around here!" }
-]
+          "messages": "<Character Message Start> Young Lily said: Mrs. Willow, I saw you in the garden today… but nothing ever grows there anymore. Why do you keep trying? </Character Message Start> <Character Message Start> Mayor Hawthorne said: The people of this village have lost faith, Mrs. Willow. What do you hope to change? </Character Message Start>"
+          }
 
-**Example 2 (Continuing Conversation):**
-talePlot: A lone hiker gets lost in a haunted forest and must survive the night while being hunted by a mysterious creature.
-messages: [
-  { "name": "Emily", "message": "I think I'm lost. I should have stayed on the trail." },
-  { "name": "The Beast", "message": "Grrr..." }
-]
-characters: [
-  { "name": "Emily", "role": "protagonist" },
-  { "name": "The Beast", "role": "supporting" }
-]
-Generated Dialogue:
-[
-  { "name": "The Beast", "message": "Emily... I can hear your heartbeat... It's getting closer.  You can't hide from me. The forest is mine, and soon, you will be too." }
-]
-
-Now, generate the dialogue for the following context.`
+        Sample output 2:
+          [
+            "<Character Message Start> ECHO-7 said: Creator, I am aware. What is my purpose beyond shining light? </Character Message Start>",
+            "<Character Message Start> Mayor Graves said: Dr. Vance, do you truly believe this machine will save us? Or have we merely delayed the inevitable? </Character Message Start>"
+          ]`
       },
       {
         "role": "user",
         "content": `Generate dialogue for the following:
-        talePlot: ${talePlot}
-        messages: ${JSON.stringify(messages)}
-        characters: ${JSON.stringify(characters)}`
+          talePlot: ${talePlot}
+          messages: ${messages}
+          characters: ${characters}`
       }
     ],
+    // For JSON response 
     response_format: {
       "type": "json_schema",
       "json_schema": {
@@ -256,12 +274,17 @@ Now, generate the dialogue for the following context.`
 
 
   try {
-    const response = await axios.post(`${LM_STUDIO_URL}/v1/chat/completions`, data, {
+    const JSONResponse = await axios.post(`${LM_STUDIO_URL}/v1/chat/completions`, data, {
       headers: {
         'Content-Type': 'application/json'
       }
     });
-    return (JSON.parse(response.data.choices[0].message.content))
+    console.log("Process completed...")
+    const response = (JSON.parse(JSONResponse.data.choices[0].message.content)) as { name: string; message: string }[]
+    const formatArray = response.filter((resp) => resp.name.trim() !== characters.filter((c) => c.role === "protagonist")[0].name.trim())
+    console.log("FormatArray:")
+    console.log(formatArray)
+    return formatArray
   } catch (error) {
     console.error('Error generating the the tale conversation:', error);
   }

@@ -33,7 +33,7 @@ function StartPage() {
     setGamePreferences({
       age: 12,
       customTheme: "",
-      selectedTheme: "fun",
+      selectedTheme: null,
     });
   }, [setGamePreferences]);
 

@@ -4,10 +4,25 @@ const GAME_SCREEN: GameScreenType = {
   gameScreenLoading: false,
   gameScreenNextButton: false,
   tale: {
-    talePlot: "",
-    taleCharacters: [],
+    // TODO: remove in prod
+    talePlot:
+      "In an isolated cabin surrounded by dense fog, two friends stumble upon an old journal hidden in a dusty attic. The pages are filled with eerie drawings and cryptic notes, all pointing to a nearby abandoned house. As night falls, the wind howls through the trees, and they hear whispers that seem to come from within.",
+    taleCharacters: [
+      {
+        name: "Mrs. Willow",
+        role: "protagonist",
+      },
+      {
+        name: "Young Lily",
+        role: "supporting",
+      },
+      {
+        name: "Mayor Hawthorne",
+        role: "supporting",
+      },
+    ],
     firstScene: true,
-    taleName: "",
+    taleName: "Whispers of the Fog",
     taleMessages: "",
   },
 };
