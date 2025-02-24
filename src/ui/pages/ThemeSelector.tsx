@@ -7,6 +7,7 @@ import React from "react";
 import { useNavigate } from "react-router";
 import gameScreenManager from "../services/gameScreen.services";
 import { useGameScreenContext } from "../context/GameScreenContext";
+import LoaderComponent from "../components/LoaderComponent";
 
 function ThemeSelector() {
   const { gamePreferences, setGamePreferences } = useGamePreferencesContext();
@@ -40,7 +41,6 @@ function ThemeSelector() {
   return (
     <div className="overflow-auto h-full">
       <Header />
-      <button onClick={() => console.log(gameScreeen)}>Click</button>
       <div className="max-w-4xl mx-auto px-4 ">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -171,7 +171,10 @@ function ThemeSelector() {
         <div className="flex justify-center mt-3">
           <Button
             onClick={async () => {
-              console.log(gamePreferences);
+              setGameScreen((prev) => ({
+                ...prev,
+                gameScreenLoading: true,
+              }));
               buttonClickSoundRef.current?.play();
               await gameScreenManager({
                 gameScreeen,
@@ -190,13 +193,26 @@ function ThemeSelector() {
         border-2 border-indigo-400/50 hover:border-indigo-300/50
         text-lg flex items-center justify-center gap-2 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-zinc-900 shadow-[5px_3px_0px_white] active:shadow-none active:translate-1"
           >
-            <span className="animate-pulse">▶</span>
-            Begin Adventure
-            <audio
-              src="/button-click-sound.mp3"
-              ref={buttonClickSoundRef}
-              hidden={true}
-            />
+            {gameScreeen.gameScreenLoading ? (
+              <>
+                <LoaderComponent
+                  height={32}
+                  width={32}
+                  className="animate-spin"
+                  loaderClassname="text-indigo-100"
+                />
+              </>
+            ) : (
+              <>
+                <span className="animate-pulse">▶</span>
+                Begin Adventure
+                <audio
+                  src="/button-click-sound.mp3"
+                  ref={buttonClickSoundRef}
+                  hidden={true}
+                />
+              </>
+            )}
           </Button>
         </div>{" "}
       </div>
