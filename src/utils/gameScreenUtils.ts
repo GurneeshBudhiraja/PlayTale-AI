@@ -1,12 +1,13 @@
+import { generateTaleCharacters, getCompletion } from "../ui/services/lmStudio.services";
+
 /* 
   Generate plot for the tale when the user selected any one of default themes
   from ThemeSelector page.
   The default themes are "fun" | "horror" | "happy"
 */
-export async function generatePlot(theme: SelectedTheme) {
+export async function generatePlot(theme: SelectedTheme | string, age: number) {
   try {
-    console.log("Default theme:", theme)
-    return "";
+    return (await getCompletion(theme, age)).data.choices[0].message.content
   } catch (error) {
     console.log("Error generating the plot based on the theme", error);
     return "";
@@ -19,10 +20,9 @@ export async function generatePlot(theme: SelectedTheme) {
 */
 export async function generateCharacters(talePlot: string): Promise<GameScreenCharacterType[]> {
   try {
-    console.log("The tale plot is:", talePlot)
-    return [];
+    return (await generateTaleCharacters(talePlot))
   } catch (error) {
-    console.log("Error generating 3 tale characters.", error)
+    console.log("Error generating tale characters.", error)
     return []
   }
 }

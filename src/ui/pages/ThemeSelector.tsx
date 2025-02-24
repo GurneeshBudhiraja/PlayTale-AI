@@ -5,9 +5,12 @@ import { Joystick, Skull, Sun, Sword } from "lucide-react";
 import { useGamePreferencesContext } from "../context/GamePreferencesContext";
 import React from "react";
 import { useNavigate } from "react-router";
+import gameScreenManager from "../services/gameScreen.services";
+import { useGameScreenContext } from "../context/GameScreenContext";
 
 function ThemeSelector() {
   const { gamePreferences, setGamePreferences } = useGamePreferencesContext();
+  const { gameScreeen, setGameScreen } = useGameScreenContext();
   const buttonClickSoundRef = React.useRef<HTMLAudioElement>(null);
   const navigate = useNavigate();
   const themes = [
@@ -166,10 +169,20 @@ function ThemeSelector() {
         {/* Begin Adventure button */}
         <div className="flex justify-center mt-3">
           <Button
-            onClick={() => {
+            onClick={async () => {
               console.log(gamePreferences);
               buttonClickSoundRef.current?.play();
-              setTimeout(() => navigate("/game"), 500);
+              await gameScreenManager({
+                gameScreeen,
+                setGameScreen,
+                gamePreferences,
+                setGamePreferences,
+              });
+              setGameScreen((prev) => ({
+                ...prev,
+                gameScreenLoading: false,
+              }));
+              // navigate("/game");
             }}
             className="w-full md:w-64 bg-indigo-500/90 hover:bg-indigo-400/90 text-zinc-100 
         font-bold py-3 px-8 rounded-xl transition-all duration-200

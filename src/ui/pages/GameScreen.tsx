@@ -4,21 +4,10 @@ import LeftPanel from "../components/GameScreenComponents/LeftPanel";
 import RightContenPanel from "../components/GameScreenComponents/RightContenPanel";
 import LoaderComponent from "../components/LoaderComponent";
 import { useEffect } from "react";
-import gameScreenManager from "../services/gameScreen.services";
-import { useGamePreferencesContext } from "../context/GamePreferencesContext";
 
 function GameScreen() {
-  const { gameScreeen, setGameScreen } = useGameScreenContext();
-  const { gamePreferences, setGamePreferences } = useGamePreferencesContext();
-  useEffect(() => {
-    console.log(gamePreferences);
-    gameScreenManager({
-      gameScreeen,
-      setGameScreen,
-      gamePreferences,
-      setGamePreferences,
-    });
-  }, []);
+  const { gameScreeen } = useGameScreenContext();
+  useEffect(() => {}, []);
   return (
     <div className="h-full overflow-hidden">
       <Header />

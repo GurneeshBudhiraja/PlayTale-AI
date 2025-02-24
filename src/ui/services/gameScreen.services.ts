@@ -14,35 +14,49 @@ export default async function gameScreenManager({
   // Temporary tale object
   const tempTaleObject: Tale = {
     taleCharacters: tale.taleCharacters,
-    talePlot: tale.talePlot,
+    // talePlot: tale.talePlot,
+    talePlot: "",
     taleTitle: tale.taleTitle,
     firstScene: tale.firstScene
   }
 
   try {
     // When default theme(selectedTheme) has been selected by the user and talePlot is empty string
-    if (gamePreferences.selectedTheme && tale.firstScene) {
-      // Generates a new plot based on the selected default theme
-      const talePlot = await generatePlot(gamePreferences.selectedTheme)
+    if (tale.firstScene) {
+      let tempTalePlot: string;
+      if (gamePreferences.selectedTheme) {
+        console.log(gamePreferences.selectedTheme)
+        // Generates a new plot based on the selected default theme
+        tempTalePlot = await generatePlot(gamePreferences.selectedTheme, gamePreferences.age)
+      } else {
+        console.log(gamePreferences.customTheme)
+        tempTalePlot = await generatePlot(gamePreferences.customTheme, gamePreferences.age)
+      }
 
       // Checks for the empty talePlot and throws an error on empty talePlot
-      if (!talePlot) {
+      if (!tempTalePlot) {
         throw new Error("talePlot is missing. Redirecting the user to /theme route in 2000ms")
       }
 
       // Updates the tempTaleObject with the new talePlot
-      tempTaleObject["talePlot"] = talePlot.trim()
+      tempTaleObject["talePlot"] = tempTalePlot.trim()
     }
+    console.log("Tale plot:")
+    console.log(tempTaleObject)
 
     // Generate new set of characters when the taleCharacters array is empty
     if (tale.firstScene && !tale.taleCharacters.length) {
+      console.log("generating characs")
+      console.log(tempTaleObject["talePlot"])
       const generatedTaleCharacters = await generateCharacters(tempTaleObject["talePlot"])
-      if (!(generatedTaleCharacters.length) || generatedTaleCharacters.length !== 3) {
+      if (!(generatedTaleCharacters.length)) {
         throw new Error("Missing/Incomplete taleCharacters.")
       }
       // Updates the tempTaleObject with the new generatedTaleCharacters array 
       tempTaleObject["taleCharacters"] = generatedTaleCharacters
     }
+    console.log("Tale characters:")
+    console.log(tempTaleObject)
 
     if (tale.firstScene) {
       // TODO: will come later on and modify this, since this would contain an object like title, firstScene, context, and other stuff of the game. Then we would also, go and update the context accordingly.
@@ -71,9 +85,9 @@ export default async function gameScreenManager({
       // Default theme
       selectedTheme: null
     })
-    setTimeout(() => {
-      window.location.href = "/theme"
-    }, 2000);
+    // setTimeout(() => {
+    //   window.location.href = "/theme"
+    // }, 2000);
     return;
   }
 }

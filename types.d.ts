@@ -21,7 +21,6 @@ interface GameScreenMessage {
 
 interface GameScreenCharacterType {
   name: string;
-  description: string;
   role: "protagonist" | "supporting"
 }
 
