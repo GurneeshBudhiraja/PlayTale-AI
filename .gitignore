@@ -19,3 +19,4 @@ dist-electron/
 .env
 client/
 todo.yaml
+dist-*
