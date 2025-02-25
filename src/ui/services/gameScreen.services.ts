@@ -14,11 +14,11 @@ export default async function gameScreenManager({
   // Temporary tale object
   const tempTaleObject: Tale = {
     taleCharacters: tale.taleCharacters,
-    // talePlot: tale.talePlot,
-    talePlot: "",
-    taleName: "",
+    talePlot: tale.talePlot,
+    taleProtagonistCharacter: tale.taleProtagonistCharacter,
+    taleName: tale.taleName,
     firstScene: tale.firstScene,
-    taleMessages: ""
+    taleMessages: tale.taleMessages
   }
 
   try {
@@ -58,7 +58,7 @@ export default async function gameScreenManager({
       console.log("generating characs")
       console.log(tempTaleObject["talePlot"])
       const generatedTaleCharacters = await generateCharacters(tempTaleObject["talePlot"], gamePreferences.selectedTheme || gamePreferences.customTheme) as GameScreenCharacterType[]
-      
+
       if (!(generatedTaleCharacters.length)) {
         throw new Error("Missing/Incomplete taleCharacters.")
       }
@@ -67,18 +67,26 @@ export default async function gameScreenManager({
     }
     console.log("Tale characters:")
     console.log(tempTaleObject)
+    // TODO: get the protagonist character from the taleCharacters array
+    const protagonistCharacter = tempTaleObject.taleCharacters.find((character) => character.role === "protagonist")
+    if (!protagonistCharacter) {
+      throw new Error("Missing protagonist character.")
+    }
+    const updatedTaleCharacters = tempTaleObject.taleCharacters.filter((character) => character.role !== "protagonist")
     setGameScreen((prev) => ({
       ...prev,
       tale: {
         ...prev.tale,
         firstScene: false,
-        taleCharacters: tempTaleObject.taleCharacters,
+        taleCharacters: updatedTaleCharacters,
+        taleProtagonistCharacter: protagonistCharacter,
         taleName: tempTaleObject.taleName,
         talePlot: tempTaleObject.talePlot,
       }
     }))
 
     console.log("Process completed")
+    
 
   } catch (error) {
     console.log("Error:", error)

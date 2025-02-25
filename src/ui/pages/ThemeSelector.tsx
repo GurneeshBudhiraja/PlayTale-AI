@@ -187,10 +187,10 @@ function ThemeSelector() {
                   ...prev,
                   gameScreenLoading: false,
                 }));
-                // navigate("/game");
+                navigate("/game");
               } catch (error) {
                 console.log("Error:", error);
-                // navigate("/");
+                navigate("/");
               }
             }}
             className="w-full md:w-64 bg-indigo-500/90 hover:bg-indigo-400/90 text-zinc-100 

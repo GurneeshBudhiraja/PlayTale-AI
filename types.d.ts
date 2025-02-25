@@ -27,7 +27,9 @@ interface GameScreenCharacterType {
 
 interface Tale {
   talePlot: string;
+  // Does not include protagonist
   taleCharacters: Array<GameScreenCharacterType>;
+  taleProtagonistCharacter: GameScreenCharacterType;
   firstScene: boolean;
   taleName: string;
   taleMessages: string;

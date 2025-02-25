@@ -4,11 +4,27 @@ const GAME_SCREEN: GameScreenType = {
   gameScreenLoading: false,
   gameScreenNextButton: false,
   tale: {
-    // TODO: remove in prod
-    talePlot: "",
-    taleCharacters: [],
+    talePlot:
+      "In the dim light of an abandoned Victorian pub, you and your friends set up your equipment amidst whispers that seem to come from every corner. The cold air hums with unseen presence as you tune into a peculiar EVP—a voice calling out in a dialect you can barely understand. Outside, the fog thickens, but inside, the tension grows.",
+    taleCharacters: [
+      {
+        name: "Tom Harris",
+        role: "supporting",
+        description: "",
+      },
+      {
+        name: "Lena Rodriguez",
+        role: "supporting",
+        description: "",
+      },
+    ],
+    taleProtagonistCharacter: {
+      description: "",
+      name: "Evelyn Hart",
+      role: "protagonist",
+    },
     firstScene: true,
-    taleName: "",
+    taleName: "Echoes of the Past",
     taleMessages: "",
   },
 };
