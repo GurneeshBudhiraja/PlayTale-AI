@@ -71,52 +71,22 @@ export async function getCompletion(userPrompt: string, age: number, modelName: 
 }
 
 
-export async function generateTaleCharacters(talePlot: string, modelName: string = MODEL) {
+export async function generateTaleCharacters(talePlot: string, taleTheme: string, modelName: string = MODEL) {
   const data = {
     model: modelName,
     messages: [
       {
-        "role": "system",
-        "content": `You are a storytelling assistant that generates diverse characters for interactive stories.
-      
-      ### Guidelines:
-      - Generate an array of objects, with each object representing a character.
-      - Each character object should have a 'name' and a 'role' property.
-      - The 'role' property should be either "protagonist" or "supporting".
-      - Generate a maximum of 3 characters based on the plot.
-      - Generate a minimum of 2 characters.
-      - The characters should fit the given plot and be appropriate for the user's age.
-      
-      ### Examples:
-      
-      **Example 1 (Fun Theme, Age 10):**
-      Plot: A group of friends discover a hidden portal in their school's library that leads to a magical world.
-      Characters:
-      [
-        { "name": "Alex", "role": "protagonist" },
-        { "name": "Lily", "role": "supporting" },
-        { "name": "Sam", "role": "supporting" }
-      ]
-      
-      **Example 2 (Horror Theme, Age 16):**
-      Plot: A lone hiker gets lost in a haunted forest and must survive the night while being hunted by a mysterious creature.
-      Characters:
-      [
-        { "name": "Emily", "role": "protagonist" },
-        { "name": "The Beast", "role": "supporting" }
-      ]
-      
-      **Example 3 (Sci-Fi Theme, Age 25):**
-      Plot: A scientist discovers a message from an alien civilization and must decipher its meaning before it's too late.
-      Characters:
-      [
-        { "name": "Dr. Lee", "role": "protagonist" },
-        { "name": "Commander Xylar", "role": "supporting" }
-      ]
-      
-      Now, generate the characters for the following plot.`
+        "role": "user",
+        "content": `Generate characters for the following story plot where the initial theme entered by the user is ${taleTheme}:
+          talePlot: ${talePlot}
+          ### Guidelines:
+          - Identify characters mentioned in the plot and generate them accordingly.
+          - If no characters are explicitly mentioned, create original characters fitting the theme.
+          - Each character should have a unique name, a 'role' ("protagonist" or "supporting"), and a detailed description.
+          - Generate 2 to 3 characters in total.
+          - Ensure the characters align with the genre and tone of the talePlot.`,
       },
-      { "role": "user", "content": `Create the characters for <TALE-PLOT>${talePlot}</TALE-PLOT>` }
+      { "role": "user", "content": `Create the characters for<TALE- PLOT > ${talePlot} </TALE-PLOT>` }
     ],
     response_format: {
       "type": "json_schema",
@@ -134,9 +104,12 @@ export async function generateTaleCharacters(talePlot: string, modelName: string
               "role": {
                 "type": "string",
                 "enum": ["protagonist", "supporting"]
+              },
+              "description": {
+                "type": "string"
               }
             },
-            "required": ["name", "role"]
+            "required": ["name", "role", "description"]
           },
           "minItems": 2,
           "maxItems": 3
@@ -153,6 +126,7 @@ export async function generateTaleCharacters(talePlot: string, modelName: string
         'Content-Type': 'application/json'
       }
     });
+    console.log(JSON.parse(response.data.choices[0].message.content))
     return (JSON.parse(response.data.choices[0].message.content))
   } catch (error) {
     console.error('Error generating characters:', error);

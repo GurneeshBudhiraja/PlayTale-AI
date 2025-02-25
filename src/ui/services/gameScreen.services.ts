@@ -57,7 +57,8 @@ export default async function gameScreenManager({
     if (tale.firstScene && !tale.taleCharacters.length) {
       console.log("generating characs")
       console.log(tempTaleObject["talePlot"])
-      const generatedTaleCharacters = await generateCharacters(tempTaleObject["talePlot"])
+      const generatedTaleCharacters = await generateCharacters(tempTaleObject["talePlot"], gamePreferences.selectedTheme || gamePreferences.customTheme) as GameScreenCharacterType[]
+      
       if (!(generatedTaleCharacters.length)) {
         throw new Error("Missing/Incomplete taleCharacters.")
       }
