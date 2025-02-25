@@ -6,21 +6,14 @@ import LoaderComponent from "../LoaderComponent";
 import MessageComponent from "./MessageComponent";
 import { generateTaleConversaton } from "../../services/lmStudio.services";
 import { useGamePreferencesContext } from "../../context/GamePreferencesContext";
-import { useNavigate } from "react-router";
-import { ReceiptEuroIcon } from "lucide-react";
 
 function RightContenPanel() {
   const [userResponse, setUserResponse] = useState<string>("");
   const { gameScreeen, setGameScreen } = useGameScreenContext();
   const { gamePreferences } = useGamePreferencesContext();
-  const [showCharacters, setShowCharacters] = useState<boolean>(false);
-  // const [messages, setMessages] = useState<
-  //   { name: string; role: "supporting" | "protagonist"; message: string }[]
-  // >([]);
   const [messages, setMessages] = useState<
     { name: string; role: "supporting" | "protagonist"; message: string }[]
-  >(gameScreeen.characterDialogs);
-  const navigate = useNavigate();
+  >([]);
   const endRef = useRef<HTMLDivElement | null>(null);
 
   // Runs on component mount
@@ -71,7 +64,8 @@ function RightContenPanel() {
         }));
       }
     }
-    // firstSceneGenerator();
+    firstSceneGenerator();
+    // eslint-disable-next-line
   }, []);
 
   async function handleSubmit(e: React.FormEvent) {
@@ -86,9 +80,17 @@ function RightContenPanel() {
     ]);
     setUserResponse("");
     endRef.current?.scrollIntoView({ behavior: "smooth" });
+    return;
     setGameScreen((prev) => ({
       ...prev,
       gameScreenLoading: true,
+      characterDialogs: [
+        ...prev.characterDialogs,
+        {
+          name: gameScreeen.tale.taleProtagonistCharacter.name,
+          message: userResponse,
+        },
+      ],
     }));
     console.log("GENERATING NEW SCENE");
     try {
@@ -137,83 +139,6 @@ function RightContenPanel() {
 
   return (
     <div className="w-2/3 flex flex-col px-6 space-y-6 overflow-y-auto justify-between">
-      {/* Story Text */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="space-y-4"
-      >
-        {/* Tale title, plot and tale characters info */}
-        <div className="p-4 rounded-lg bg-zinc-800/50 border border-zinc-700/30">
-          <div className="flex items-start gap-3">
-            <div className="rounded-full bg-indigo-500/20 flex items-center justify-center p-1">
-              <span className="text-indigo-400 text-lg">⚔</span>
-            </div>
-            <div>
-              <h4 className="text-sm font-semibold text-indigo-400 mb-1">
-                {gameScreeen.tale.taleName}
-              </h4>
-              <p className="text-zinc-300 text-sm">
-                {gameScreeen.tale.talePlot}
-              </p>
-            </div>
-          </div>
-          <div className="mt-4">
-            <Button
-              onClick={() => {
-                setShowCharacters(!showCharacters);
-              }}
-              className="flex items-center gap-1 w-full"
-            >
-              <h4 className="text-md font-semibold text-indigo-400 mb-2">
-                Tale Characters
-              </h4>
-              <span className="text-indigo-400 mb-1">
-                {showCharacters ? "▼" : "▶"}
-              </span>
-            </Button>
-
-            {showCharacters && (
-              <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: "auto" }}
-                exit={{ opacity: 0, height: 0 }}
-                transition={{ duration: 0.2 }}
-              >
-                {gameScreeen.tale.taleCharacters.map((character, index) => (
-                  <div key={index} className="flex items-start gap-3 mt-2">
-                    <div className="w-8 h-8 rounded-full bg-indigo-500/20 flex items-center justify-center">
-                      <span className="text-indigo-400 text-lg">👤</span>
-                    </div>
-                    <div>
-                      <h4 className="text-sm font-semibold text-indigo-400 mb-0">
-                        {character.name}
-                      </h4>
-                      <p className="text-xs text-zinc-300/45 leading-relaxed">
-                        {character.role}
-                      </p>
-                    </div>
-                  </div>
-                ))}
-                <div key={Date.now()} className="flex items-start gap-3 mt-2">
-                  <div className="w-8 h-8 rounded-full bg-indigo-500/20 flex items-center justify-center">
-                    <span className="text-indigo-400 text-lg">👤</span>
-                  </div>
-                  <div>
-                    <h4 className="text-sm font-semibold text-indigo-400 ">
-                      {gameScreeen.tale.taleProtagonistCharacter.name}
-                    </h4>
-                    <p className="text-xs text-zinc-300/45 leading-relaxed">
-                      {gameScreeen.tale.taleProtagonistCharacter.role}
-                    </p>
-                  </div>
-                </div>
-              </motion.div>
-            )}
-          </div>
-        </div>
-      </motion.div>
-
       {/* Player Input */}
       <motion.div
         initial={{ opacity: 0 }}
@@ -222,17 +147,28 @@ function RightContenPanel() {
         className="backdrop-blur-sm pt-4 h-full flex flex-col justify-between"
       >
         <div className="flex-1">
-          {messages.map((message, index) => (
+          {gameScreeen.gameScreenLoading ? (
             <>
-              <MessageComponent
-                key={index}
-                characterName={message.name}
-                role={message.role}
-                message={message.message}
+              <LoaderComponent
+                width={32}
+                height={32}
+                className="h-full flex justify-center items-center"
+                loaderClassname="text-indigo-400"
               />
-              {index === messages.length - 1 && <div ref={endRef} />}
             </>
-          ))}
+          ) : (
+            messages.map((message, index) => (
+              <>
+                <MessageComponent
+                  key={index}
+                  characterName={message.name}
+                  role={message.role}
+                  message={message.message}
+                />
+                {index === messages.length - 1 && <div ref={endRef} />}
+              </>
+            ))
+          )}
         </div>
         <div className="py-10">
           <p className="text-zinc-400 text-sm mt-4 italic">
