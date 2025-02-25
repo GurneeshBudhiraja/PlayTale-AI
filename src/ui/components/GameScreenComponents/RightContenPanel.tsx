@@ -80,7 +80,6 @@ function RightContenPanel() {
     ]);
     setUserResponse("");
     endRef.current?.scrollIntoView({ behavior: "smooth" });
-    return;
     setGameScreen((prev) => ({
       ...prev,
       gameScreenLoading: true,
@@ -126,7 +125,7 @@ function RightContenPanel() {
         role: "supporting",
       }));
       // @ts-expect-error Types issue
-      setMessages(formatCharacterDialog);
+      setMessages([...messages, ...formatCharacterDialog]);
     } catch (error) {
       console.log("Error in handleSubmit: ", error);
     } finally {
@@ -147,28 +146,17 @@ function RightContenPanel() {
         className="backdrop-blur-sm pt-4 h-full flex flex-col justify-between"
       >
         <div className="flex-1">
-          {gameScreeen.gameScreenLoading ? (
+          {messages.map((message, index) => (
             <>
-              <LoaderComponent
-                width={32}
-                height={32}
-                className="h-full flex justify-center items-center"
-                loaderClassname="text-indigo-400"
+              <MessageComponent
+                key={index}
+                characterName={message.name}
+                role={message.role}
+                message={message.message}
               />
+              {index === messages.length - 1 && <div ref={endRef} />}
             </>
-          ) : (
-            messages.map((message, index) => (
-              <>
-                <MessageComponent
-                  key={index}
-                  characterName={message.name}
-                  role={message.role}
-                  message={message.message}
-                />
-                {index === messages.length - 1 && <div ref={endRef} />}
-              </>
-            ))
-          )}
+          ))}
         </div>
         <div className="py-10">
           <p className="text-zinc-400 text-sm mt-4 italic">

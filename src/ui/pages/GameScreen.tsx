@@ -11,15 +11,14 @@ function GameScreen() {
   useEffect(() => {
     setGameScreen((prev) => ({
       ...prev,
-      gameScreenLoading: false,
+      gameScreenLoading: true,
     }));
     // Navigate to "/" route if taleName is not present
-    // if (!gameScreeen.tale.taleName) navigate("/");
+    if (!gameScreeen.tale.taleName) navigate("/");
   }, [navigate, gameScreeen.tale.taleName, setGameScreen]);
   return (
     <div className="h-full overflow-hidden">
       <Header />
-      <button onClick={() => console.log(gameScreeen)}>Click</button>
 
       <div className="flex h-[calc(100%-4rem)]">
         {/* Left Image Panel */}
