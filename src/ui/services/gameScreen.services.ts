@@ -18,7 +18,6 @@ export default async function gameScreenManager({
     taleProtagonistCharacter: tale.taleProtagonistCharacter,
     taleName: tale.taleName,
     firstScene: tale.firstScene,
-    taleMessages: tale.taleMessages
   }
 
   try {
@@ -67,7 +66,6 @@ export default async function gameScreenManager({
     }
     console.log("Tale characters:")
     console.log(tempTaleObject)
-    // TODO: get the protagonist character from the taleCharacters array
     const protagonistCharacter = tempTaleObject.taleCharacters.find((character) => character.role === "protagonist")
     if (!protagonistCharacter) {
       throw new Error("Missing protagonist character.")
@@ -86,7 +84,7 @@ export default async function gameScreenManager({
     }))
 
     console.log("Process completed")
-    
+
 
   } catch (error) {
     console.log("Error:", error)
@@ -96,9 +94,9 @@ export default async function gameScreenManager({
       // Default theme
       selectedTheme: null
     })
-    setTimeout(() => {
-      window.location.href = "/theme"
-    }, 2000);
+    // setTimeout(() => {
+    //   window.location.href = "/theme"
+    // }, 2000);
     return;
   }
 }

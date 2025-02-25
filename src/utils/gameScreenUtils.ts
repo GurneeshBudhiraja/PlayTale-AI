@@ -18,7 +18,7 @@ export async function generatePlot(theme: SelectedTheme | string, age: number) {
 /*
   Generates the 3 character names using the tale plot.
 */
-export async function generateCharacters(talePlot: string, taleTheme:string): Promise<GameScreenCharacterType[]> {
+export async function generateCharacters(talePlot: string, taleTheme: string): Promise<GameScreenCharacterType[]> {
   try {
     return (await generateTaleCharacters(talePlot, taleTheme))
   } catch (error) {
@@ -46,6 +46,7 @@ export async function generateScene({
     characters
   })
   try {
+    // @ts-expect-error type issue
     return (await generateTaleConversaton({ messages, characters, talePlot }));
   } catch (error) {
     console.log(error)

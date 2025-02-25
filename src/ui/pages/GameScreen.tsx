@@ -7,31 +7,31 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router";
 
 function GameScreen() {
-  const { gameScreeen } = useGameScreenContext();
+  const { gameScreeen, setGameScreen } = useGameScreenContext();
   const navigate = useNavigate();
   useEffect(() => {
+    setGameScreen((prev) => ({
+      ...prev,
+      gameScreenLoading: true,
+    }));
     // Navigate to "/" route if taleName is not present
-    if (!gameScreeen.tale.taleName) navigate("/");
-  }, [navigate, gameScreeen.tale.taleName]);
+    // if (!gameScreeen.tale.taleName) navigate("/");
+    setGameScreen((prev) => ({
+      ...prev,
+      gameScreenLoading: false,
+    }));
+  }, [navigate, gameScreeen.tale.taleName, setGameScreen]);
   return (
     <div className="h-full overflow-hidden">
       <Header />
       <button onClick={() => console.log(gameScreeen)}>Click</button>
-      {gameScreeen.gameScreenLoading ? (
-        <div className="flex flex-col gap-4 justify-center items-center h-full">
-          <LoaderComponent width={48} height={48} className="text-violet-400" />
-          <div className="text-violet-100 font-medium text-lg animate-pulse">
-            Setting up the tale...
-          </div>
-        </div>
-      ) : (
-        <div className="flex h-[calc(100%-4rem)]">
-          {/* Left Image Panel */}
-          <LeftPanel />
-          {/* Right Content Panel */}
-          <RightContenPanel />
-        </div>
-      )}
+
+      <div className="flex h-[calc(100%-4rem)]">
+        {/* Left Image Panel */}
+        <LeftPanel />
+        {/* Right Content Panel */}
+        <RightContenPanel />
+      </div>
     </div>
   );
 }

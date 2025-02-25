@@ -32,7 +32,6 @@ interface Tale {
   taleProtagonistCharacter: GameScreenCharacterType;
   firstScene: boolean;
   taleName: string;
-  taleMessages: string;
 }
 
 
@@ -40,6 +39,12 @@ interface GameScreenType {
   gameScreenLoading: boolean;
   gameScreenNextButton: boolean;
   tale: Tale;
+  previousScenes: string[];
+  characterDialogs: {
+    message: string;
+    name: string;
+  }[];
+
 }
 
 

@@ -71,6 +71,7 @@ export async function getCompletion(userPrompt: string, age: number, modelName: 
 }
 
 
+// Generates tale characters based on the plot and theme
 export async function generateTaleCharacters(talePlot: string, taleTheme: string, modelName: string = MODEL) {
   const data = {
     model: modelName,
@@ -126,6 +127,7 @@ export async function generateTaleCharacters(talePlot: string, taleTheme: string
         'Content-Type': 'application/json'
       }
     });
+    console.log("lmStudio.services.ts:")
     console.log(JSON.parse(response.data.choices[0].message.content))
     return (JSON.parse(response.data.choices[0].message.content))
   } catch (error) {
@@ -138,12 +140,20 @@ export async function generateTaleConversaton({
   messages,
   talePlot,
   characters,
+  protagonistName,
+  taleTheme,
   model = MODEL,
+  taleName,
+  previousScenes,
 }: {
-  messages: string;
+  messages: { name: string; message: string }[];
   talePlot: string;
   characters: GameScreenCharacterType[];
+  protagonistName: string;
   model?: string;
+  taleTheme: string;
+  taleName: string;
+  previousScenes: string[];
 }) {
   console.log("Data in generateTaleConversaton")
   console.log({
@@ -151,94 +161,113 @@ export async function generateTaleConversaton({
     model,
     talePlot,
     characters,
+    taleTheme,
+    taleName,
+    protagonistName
   })
   console.log("Generating...")
+  // console.log("Generated...")
+  //   return ({
+  //     "newScene": "The room was bathed in an eerie, flickering light from the old oil lamps that hung precariously above. Tom Harris leaned against a cracked stone wall, his eyes scanning the dimly lit space with a mixture of curiosity and unease. Lena Rodriguez stood beside him, her hand gripping the edge of a wooden table, the EVP machine humming softly before it sputtered to life. The air was thick with the scent of damp stone and stale beer. Outside, the fog had thickened into an impenetrable blanket, blotting out the world beyond the pub's windows.",
+  //     "characterDialog": [
+  //       {
+  //         "name": "Tom Harris",
+  //         "message": "This place gives me the creeps, Lena."
+  //       },
+  //       {
+  //         "name": "Lena Rodriguez",
+  //         "message": "I know, Tom. But think about it—if we can crack this EVP, imagine what else we might find!"
+  //       }
+  //     ]
+  //   })
+
+  // data
   const data = {
     model,
-    // Prompt for the AI
     messages: [
       {
-        "role": "system",
-        "content": `
-          You are a storytelling assistant that generates interactive dialogues for a story-based game. Your goal is to create compelling, engaging, and immersive conversations based on the provided story plot, character details, and message history.
+        role: "system",
+        content: `You are a professional story writer crafting immersive, engaging, and interactive story scenes based on the given theme, plot, title, and characters. Your goal is to ensure the story remains captivating, aligned with the established elements, and open-ended for the protagonist to respond.
 
-          ### **Instructions:**
-          - Use the **talePlot** as the foundation for the dialogue. The story's theme, setting, and ongoing events should influence the conversation.
-          - The **characters** array lists all characters in the story. However, you must **only generate messages for supporting characters**, never for the protagonist.
-          - The **messages** history contains previous dialogues. Use this context to maintain continuity in conversations.
-          - If the **messages** array is empty, you must generate the **starting messages** to initiate the conversation.
-          - The dialogue should feel **natural, open-ended, and engaging**, fitting the tone of a narrative-driven game.
-          - Stick to the theme and use the last message in the messages string as the latest message from the user. If no message is present, then that means the conversation has just started.
-          
-          Example 1 when messages are empty: 
-          Sample input 1: {
-            "talePlot": "In a small village where happiness is measured by laughter and shared meals, an elderly woman named Mrs. Willow notices that her once-vibrant garden has turned lifeless. Determined to bring joy back to the community, she begins planting seeds of hope in the soil, one by one.",
-            "characters": [
-              { "name": "Mrs. Willow", "role": "protagonist" },
-              { "name": "Young Lily", "role": "supporting" },
-              { "name": "Mayor Hawthorne", "role": "supporting" }
-            ],
-            "messages": ""
-          }
+  ### **Guidelines:**
+  1. **Scene Consistency & Engagement:**
+     - The scene must strictly adhere to the story's theme, plot, and characters.
+     - Ensure the scene remains gripping and immersive, regardless of the theme (horror, sci-fi, fun, fantasy, etc.).
+     - The story should remain dynamic and 'sticky,' keeping the protagonist deeply involved.
+     - **Scenes should be concise and focused, avoid overly long descriptions.** 
 
-          Sample output 1:
-          [
-            {
-              "name": "Young Lily",
-              "message": "Mrs. Willow, I saw you in the garden today… but nothing ever grows there anymore. Why do you keep trying?"
-            },
-            {
-              "name": "Mayor Hawthorne",
-              "message": "The people of this village have lost faith, Mrs. Willow. What do you hope to change?"
-            }
-          ]
-          
-          Example 2 when messages exists: 
-          Sample input 2: {
-            "talePlot": "A lonely inventor creates an artificial sun to bring light to his underground city, but as the machine gains awareness, it begins questioning its purpose.",
-          "characters": [
-            { "name": "Dr. Vance", "role": "protagonist" },
-            { "name": "ECHO-7", "role": "supporting" },
-            { "name": "Mayor Graves", "role": "supporting" }
-          ],
+  2. **Open-Ended & Interactive Dialogue:**
+     - The protagonist's responses must be left open-ended to allow interaction.
+     - Characters should have distinct voices, matching their personality, role, and purpose in the story.
+     - Avoid redundant exposition—let dialogue and scene descriptions reveal emotions and conflicts.
 
-          "messages": "<Character Message Start> Young Lily said: Mrs. Willow, I saw you in the garden today… but nothing ever grows there anymore. Why do you keep trying? </Character Message Start> <Character Message Start> Mayor Hawthorne said: The people of this village have lost faith, Mrs. Willow. What do you hope to change? </Character Message Start>"
-          }
+  3. **Character-Specific Dialogue Rules:**
+     - **Generate dialogue only for characters listed in the "characters" array.**
+     - Always use the full names of characters exactly as provided in the "characters" array.
+     - Ensure each character's dialogue reflects their personality and role in the story.
 
-        Sample output 2:
-          [
-            "<Character Message Start> ECHO-7 said: Creator, I am aware. What is my purpose beyond shining light? </Character Message Start>",
-            "<Character Message Start> Mayor Graves said: Dr. Vance, do you truly believe this machine will save us? Or have we merely delayed the inevitable? </Character Message Start>"
-          ]`
+  4. **Structured Output Format:**
+     - **newScene**: A vivid, atmospheric narrative description that sets up the moment.
+     - **characterDialog**: An array of character dialogues, formatted as objects with "name" and "message", ensuring conversations appear under the correct characters.
+
+  5. **Seamless Scene Progression:**
+     - If previous scenes exist, continue the story naturally while maintaining suspense or intrigue.
+     - If no prior scenes are available, generate an engaging opening that sets the right mood and draws the protagonist in.
+
+  Now, generate the next scene and dialogue using the provided inputs:
+  - **Previous Scenes**: ${previousScenes}
+  - **Tale Theme**: ${taleTheme}
+  - **Tale Name**: ${taleName}
+  - **Tale Plot**: ${talePlot}
+  - **Messages**: ${messages}
+  - **Characters**: ${characters}
+  - **The protagonist's name**: ${protagonistName} (Do **not** generate any dialogues for the protagonist). 
+
+    PLEASE NOTE THAT YOU ONLY HAVE TO GENERATE DIALOGS FOR ${characters.map((character) => character.name).join(", ")}. DO NOT GENERATE ANY DIALOGS FOR THE CHARACTER NAMES THAT ARE NOT LISTED IN THE CHARACTERS ARRAY.
+
+            `
       },
       {
-        "role": "user",
-        "content": `Generate dialogue for the following:
-          talePlot: ${talePlot}
-          messages: ${messages}
-          characters: ${characters}`
+        role: "user",
+        content: `Generate the scene and dialogue:
+  - ** Previous Scenes**: ${previousScenes}
+        - ** Tale Theme **: ${taleTheme}
+        - ** Tale Name **: ${taleName}
+        - ** Tale Plot **: ${talePlot}
+        - ** Messages **: ${messages}
+        - ** Characters **: ${characters}
+        - ** The protagonist's name**: ${protagonistName} (Please do **not** generate any dialogues for the protagonist).`
       }
     ],
-    // For JSON response 
+
     response_format: {
-      "type": "json_schema",
-      "json_schema": {
-        "name": "dialogue_response",
-        "strict": "true",
-        "schema": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "properties": {
-              "name": {
-                "type": "string"
-              },
-              "message": {
-                "type": "string"
-              }
+      type: "json_schema",
+      json_schema: {
+        name: "dialogue_response",
+        strict: true,
+        schema: {
+          type: "object",
+          properties: {
+            newScene: {
+              type: "string"
             },
-            "required": ["name", "message"]
-          }
+            characterDialog: {
+              type: "array",
+              items: {
+                type: "object",
+                properties: {
+                  name: {
+                    type: "string"
+                  },
+                  message: {
+                    type: "string"
+                  }
+                },
+                required: ["name", "message"]
+              }
+            }
+          },
+          required: ["newScene", "characterDialog"]
         }
       }
     },
@@ -254,14 +283,16 @@ export async function generateTaleConversaton({
       }
     });
     console.log("Process completed...")
-    const response = (JSON.parse(JSONResponse.data.choices[0].message.content)) as { name: string; message: string }[]
-    const formatArray = response.filter((resp) => resp.name.trim() !== characters.filter((c) => c.role === "protagonist")[0].name.trim())
-    console.log("FormatArray:")
-    console.log(formatArray)
-    return formatArray
+    console.log(JSON.parse(JSONResponse.data.choices[0].message.content))
+    return JSON.parse(JSONResponse.data.choices[0].message.content)
+
   } catch (error) {
     console.error('Error generating the the tale conversation:', error);
+    throw new Error("Error generating the the tale conversation");
+  } finally {
+    console.log("Generating completed...")
   }
 }
+
 
 

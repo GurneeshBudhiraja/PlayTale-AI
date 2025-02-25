@@ -1,39 +1,137 @@
 import { motion } from "motion/react";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Button from "../Button";
 import { useGameScreenContext } from "../../context/GameScreenContext";
 import LoaderComponent from "../LoaderComponent";
 import MessageComponent from "./MessageComponent";
+import { generateTaleConversaton } from "../../services/lmStudio.services";
+import { useGamePreferencesContext } from "../../context/GamePreferencesContext";
+import { useNavigate } from "react-router";
+import { ReceiptEuroIcon } from "lucide-react";
 
 function RightContenPanel() {
   const [userResponse, setUserResponse] = useState<string>("");
-  const { gameScreeen } = useGameScreenContext();
-  const [loading, setLoading] = useState<boolean>(false);
+  const { gameScreeen, setGameScreen } = useGameScreenContext();
+  const { gamePreferences } = useGamePreferencesContext();
   const [showCharacters, setShowCharacters] = useState<boolean>(false);
+  // const [messages, setMessages] = useState<
+  //   { name: string; role: "supporting" | "protagonist"; message: string }[]
+  // >([]);
   const [messages, setMessages] = useState<
     { name: string; role: "supporting" | "protagonist"; message: string }[]
-  >([]);
+  >(gameScreeen.characterDialogs);
+  const navigate = useNavigate();
   const endRef = useRef<HTMLDivElement | null>(null);
+
+  // Runs on component mount
+  useEffect(() => {
+    // Generates the very first scene
+    async function firstSceneGenerator() {
+      try {
+        console.log("I am in firstSceneGenerator");
+        const response = (await generateTaleConversaton({
+          characters: gameScreeen.tale.taleCharacters,
+          messages: gameScreeen.characterDialogs,
+          talePlot: gameScreeen.tale.talePlot,
+          taleTheme:
+            gamePreferences.selectedTheme ?? gamePreferences.customTheme,
+          taleName: gameScreeen.tale.taleName,
+          protagonistName: gameScreeen.tale.taleProtagonistCharacter.name,
+          previousScenes: [],
+        })) as {
+          characterDialog: { name: string; message: string }[];
+          newScene: string;
+        };
+        console.log(response);
+        const { characterDialog, newScene } = response;
+        setGameScreen((prev) => ({
+          ...prev,
+          characterDialogs: [...prev.characterDialogs, ...characterDialog],
+          previousScenes: [...prev.previousScenes, newScene],
+          gameScreenLoading: false,
+          tale: {
+            ...prev.tale,
+            firstScene: false,
+          },
+        }));
+        setMessages(() => {
+          const modifiedArray = characterDialog.map((dialog) => ({
+            ...dialog,
+            role: "supporting" as "supporting" | "protagonist",
+          }));
+          return modifiedArray;
+        });
+      } catch (error) {
+        console.log("Error:", error);
+        // navigate("/theme");
+      } finally {
+        setGameScreen((prev) => ({
+          ...prev,
+          gameScreenLoading: false,
+        }));
+      }
+    }
+    // firstSceneGenerator();
+  }, []);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (loading || !userResponse.trim()) return;
-    setLoading(true);
+    setMessages([
+      ...messages,
+      {
+        name: gameScreeen.tale.taleProtagonistCharacter.name,
+        role: "protagonist",
+        message: userResponse,
+      },
+    ]);
+    setUserResponse("");
+    endRef.current?.scrollIntoView({ behavior: "smooth" });
+    setGameScreen((prev) => ({
+      ...prev,
+      gameScreenLoading: true,
+    }));
+    console.log("GENERATING NEW SCENE");
     try {
-      setMessages([
-        ...messages,
-        {
-          name: gameScreeen.tale.taleProtagonistCharacter.name,
-          role: "protagonist",
-          message: userResponse,
-        },
-      ]);
-      setUserResponse("");
-      endRef.current?.scrollIntoView({ behavior: "smooth" });
+      const scene = (await generateTaleConversaton({
+        characters: gameScreeen.tale.taleCharacters,
+        messages: [
+          ...gameScreeen.characterDialogs,
+          {
+            message: userResponse,
+            name: gameScreeen.tale.taleProtagonistCharacter.name,
+          },
+        ],
+        previousScenes: gameScreeen.previousScenes,
+        protagonistName: gameScreeen.tale.taleProtagonistCharacter.name,
+        taleName: gameScreeen.tale.taleName,
+        talePlot: gameScreeen.tale.talePlot,
+        taleTheme: gamePreferences.selectedTheme ?? gamePreferences.customTheme,
+      })) as {
+        newScene: string;
+        characterDialog: {
+          name: string;
+          message: string;
+        }[];
+      };
+      const { characterDialog, newScene } = scene;
+      setGameScreen((prev) => ({
+        ...prev,
+        characterDialogs: [...prev.characterDialogs, ...characterDialog],
+        previousScenes: [...prev.previousScenes, newScene],
+      }));
+      const formatCharacterDialog = characterDialog.map((character) => ({
+        ...character,
+        role: "supporting",
+      }));
+      // @ts-expect-error Types issue
+      setMessages(formatCharacterDialog);
     } catch (error) {
       console.log("Error in handleSubmit: ", error);
     } finally {
-      setLoading(false);
+      setGameScreen((prev) => ({
+        ...prev,
+        gameScreenLoading: false,
+      }));
     }
   }
 
@@ -62,7 +160,9 @@ function RightContenPanel() {
           </div>
           <div className="mt-4">
             <Button
-              onClick={() => setShowCharacters(!showCharacters)}
+              onClick={() => {
+                setShowCharacters(!showCharacters);
+              }}
               className="flex items-center gap-1 w-full"
             >
               <h4 className="text-md font-semibold text-indigo-400 mb-2">
@@ -157,7 +257,7 @@ function RightContenPanel() {
                   type: "submit",
                 }}
               >
-                {loading ? (
+                {gameScreeen.gameScreenLoading ? (
                   <>
                     <LoaderComponent
                       width={16}

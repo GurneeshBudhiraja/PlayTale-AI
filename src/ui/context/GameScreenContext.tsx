@@ -4,29 +4,40 @@ const GAME_SCREEN: GameScreenType = {
   gameScreenLoading: false,
   gameScreenNextButton: false,
   tale: {
-    talePlot:
-      "In the dim light of an abandoned Victorian pub, you and your friends set up your equipment amidst whispers that seem to come from every corner. The cold air hums with unseen presence as you tune into a peculiar EVP—a voice calling out in a dialect you can barely understand. Outside, the fog thickens, but inside, the tension grows.",
+    talePlot: "Testing tale plot",
     taleCharacters: [
       {
-        name: "Tom Harris",
+        name: "Whispering Maud",
         role: "supporting",
         description: "",
       },
       {
-        name: "Lena Rodriguez",
+        name: "The Moving Tome",
         role: "supporting",
         description: "",
       },
     ],
     taleProtagonistCharacter: {
+      name: "Testing user",
       description: "",
-      name: "Evelyn Hart",
       role: "protagonist",
     },
     firstScene: true,
-    taleName: "Echoes of the Past",
-    taleMessages: "",
+    taleName: "The testing tale",
   },
+  characterDialogs: [
+    {
+      name: "Whispering Maud",
+      message: "Eleanor... come closer...",
+    },
+    {
+      name: "The Moving Tome",
+      message: "Read us... before it's too late...",
+    },
+  ],
+  previousScenes: [
+    "The dim light flickered, casting eerie shadows across the forgotten basement. Eleanor Hart approached the last row of shelves, her breath shallow with each step. Suddenly, a whisper cut through the silence, sending chills down her spine. She stopped, heart pounding, and strained to hear more. The whispers grew louder, clearer, almost like a chorus of voices murmuring in ancient tongues. Eleanor's eyes widened as she saw the books on the shelves. Each page seemed to flutter, as if stirred by an unseen force. The air around her grew thick with an unsettling presence.",
+  ],
 };
 
 const GameScreenContext = createContext<GameScreenContextType>({
