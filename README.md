@@ -1,7 +1,7 @@
 ## PlayTale AI
 ### Play. Create. Explore your own tales.
 
-###### PlayTale AI is an AI-powered interactive storytelling game for Windows. Unleash your imagination and explore endless stories generated in real-time!
+###### PlayTale AI is an AI-powered interactive storytelling game for Windows made for the Windows on Snapdragon AI Hackathon. Unleash your imagination and explore endless stories generated in real-time!
 
 ### Features
 1. AI-driven narratives: Dynamically generated stories and dialogues.
